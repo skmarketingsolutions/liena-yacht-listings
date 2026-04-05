@@ -10,7 +10,7 @@ export default async function NewListingPage() {
   const auth = await getAuthFromCookies();
   if (!auth) redirect('/admin/login');
 
-  const admins = auth.role === 'broker' ? getAllAdmins() : [];
+  const admins = auth.role === 'broker' ? await getAllAdmins() : [];
 
   return (
     <div className="min-h-screen bg-[#060f1c]">

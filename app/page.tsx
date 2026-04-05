@@ -13,12 +13,10 @@ export const metadata: Metadata = {
     "Liena Q Perez — Miami's luxury yacht sales specialist. Browse exclusive flybridge yachts and motor yachts for sale in Miami & Miami Beach. Contact Liena for a private showing.",
 };
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
-export default function HomePage() {
-  const listings = getAllListings();
-  const featured = listings.filter((l) => l.featured);
-  const all = listings;
+export default async function HomePage() {
+  const listings = await getAllListings();
 
   const videoUrl = process.env.NEXT_PUBLIC_HERO_VIDEO_URL || '';
 
@@ -45,11 +43,11 @@ export default function HomePage() {
           </div>
 
           {/* Cards grid */}
-          {all.length === 0 ? (
+          {listings.length === 0 ? (
             <p className="text-gray-500 text-center py-20">No listings available at this time. Check back soon.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {all.map((listing) => (
+              {listings.map((listing) => (
                 <YachtCard key={listing.id} listing={listing} />
               ))}
             </div>

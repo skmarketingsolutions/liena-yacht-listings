@@ -1,14 +1,9 @@
 /**
- * Pure-JS JSON file database — zero native dependencies.
- * Works on any Node.js version with no build tools required.
+ * Neon Postgres database layer.
+ * All functions are async — await them in route handlers and server pages.
  */
 
-import fs from 'fs';
-import path from 'path';
-import bcrypt from 'bcryptjs';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_PATH = path.join(DATA_DIR, 'db.json');
+import { neon } from '@neondatabase/serverless';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -38,7 +33,7 @@ export interface Listing {
   updated_at: string;
 }
 
-// Kept for backward-compat — identical to Listing since JSON stores parsed values
+// Kept for backward-compat
 export type RawListing = Listing;
 export function parseListing(r: RawListing): Listing { return r; }
 
@@ -64,366 +59,84 @@ export interface Lead {
   created_at: string;
 }
 
-interface DbData {
-  meta: { lastId: { admins: number; listings: number; leads: number } };
-  admins: Admin[];
-  listings: Listing[];
-  leads: Lead[];
-}
+// ── DB client (lazy singleton) ────────────────────────────────────────────────
 
-// ── File I/O ──────────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Row = Record<string, any>;
 
-function readDb(): DbData {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+let _sql: ReturnType<typeof neon> | null = null;
 
-  if (!fs.existsSync(DB_PATH)) {
-    const fresh = buildInitialData();
-    fs.writeFileSync(DB_PATH, JSON.stringify(fresh, null, 2), 'utf8');
-    return fresh;
+function getDb() {
+  if (!_sql) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    _sql = neon(process.env.DATABASE_URL);
   }
-
-  try {
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8')) as DbData;
-  } catch {
-    // Corrupted file — re-seed
-    const fresh = buildInitialData();
-    fs.writeFileSync(DB_PATH, JSON.stringify(fresh, null, 2), 'utf8');
-    return fresh;
-  }
+  return _sql;
 }
 
-function writeDb(data: DbData): void {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
+// ── Row mappers ───────────────────────────────────────────────────────────────
+
+function toStr(v: unknown): string {
+  return v instanceof Date ? v.toISOString() : String(v);
 }
 
-function nextId(data: DbData, table: keyof DbData['meta']['lastId']): number {
-  data.meta.lastId[table] += 1;
-  return data.meta.lastId[table];
-}
-
-function now(): string {
-  return new Date().toISOString();
-}
-
-// ── Seed data ─────────────────────────────────────────────────────────────────
-
-function buildInitialData(): DbData {
-  const salesHash = bcrypt.hashSync('LienaQ2024!', 10);
-  const brokerHash = bcrypt.hashSync('Admin2024!', 10);
-  const ts = now();
-
-  const liena: Admin = {
-    id: 1,
-    username: 'liena',
-    password_hash: salesHash,
-    email: 'liena@italiaboats.com',
-    role: 'salesman',
-    name: 'Liena Q Perez',
-    phone: '786-838-9911',
-    created_at: ts,
-  };
-
-  const superAdmin: Admin = {
-    id: 2,
-    username: 'admin',
-    password_hash: brokerHash,
-    email: 'liena@italiaboats.com',
-    role: 'broker',
-    name: 'Admin',
-    phone: '786-838-9911',
-    created_at: ts,
-  };
-
-  const listing1: Listing = {
-    id: 1,
-    slug: '2019-azimut-fly-50-miami',
-    title: '2019 Azimut Fly 50 — La Paloma',
-    vessel_name: 'La Paloma',
-    year: 2019,
-    make: 'Azimut',
-    model: 'Fly 50',
-    length_ft: 50,
-    price: 980000,
-    location: 'Miami, Florida',
-    description: `Introducing the stunning 2019 Azimut Fly 50 "La Paloma" — a remarkable flybridge yacht that embodies Italian elegance and performance. With an overall length of 50 feet, this vessel is crafted from durable fiberglass and powered by twin Volvo Penta inboard diesel engines, promising a reliable and exhilarating cruising experience.
-
-The Fly 50 is designed for comfort and style, featuring a spacious layout that enhances your time spent at sea. The flybridge offers an ideal vantage point for enjoying breathtaking views while relaxing with friends and family. Equipped with a SeaKeeper gyroscopic stabilizer, Raymarine electronics suite, and JoyStick docking control, this yacht handles like a dream in Miami's waters.
-
-Three beautifully appointed staterooms accommodate up to 6 guests, while the fully-equipped galley with Miele appliances ensures gourmet meals at anchor. The expansive flybridge with wet bar, grill, and U-shaped seating makes this the ultimate Miami entertainment vessel.`,
-    specs: {
-      'Length Overall': '50 ft',
-      'Beam': '15 ft 3 in',
-      'Max Draft': '4 ft 11 in',
-      'Hull Material': 'Fiberglass',
-      'Hull Class': 'Flybridge',
-      'Year': '2019',
-      'Fuel Type': 'Diesel',
-      'Engine 1': 'Volvo Penta Inboard Diesel',
-      'Engine 2': 'Volvo Penta Inboard Diesel',
-      'Stabilizer': 'SeaKeeper Gyro',
-      'Condition': 'Used',
-    },
-    features: {
-      'Salon': [
-        'Wood flooring throughout',
-        'Port & starboard salon sofas',
-        'Hi-Low table on starboard side',
-        'Bose sound system',
-        'Sony 4K 3D BluRay',
-        'Dometic A/C electronic display',
-        'Large panoramic windows',
-      ],
-      'Galley': [
-        'Galley located aft salon port side',
-        'Large countertop with wood flooring',
-        'Vitrifrigo undercounter refrigerator',
-        'Miele Microwave/Oven',
-        'Miele Induction cooktop',
-        'Stainless steel sink',
-      ],
-      'Electronics': [
-        '(2) Twin Raymarine MFD displays',
-        'Raymarine Autopilot',
-        'JoyStick docking control',
-        'Raymarine VHF Radio',
-        'SeaKeeper display',
-        'Sea-Fire shutdown system',
-        'Raymarine Radar',
-        'Volvo Penta engine display',
-      ],
-      'Companionway': [
-        'Splendide washer & dryer',
-        'Vitrifrigo refrigerator',
-      ],
-      'Forward VIP Stateroom': [
-        'Centerline queen bed',
-        'Bose sound system',
-        'Samsung TV',
-        'Dometic A/C electronic display',
-        '(2) Hanging closets',
-        'Emergency escape hatch',
-        'Marine CO alarm',
-        'Reading lights',
-      ],
-      'Guest Stateroom': [
-        '(2) Single beds with mattresses',
-        'Carpet flooring',
-        'Hanging closet',
-        'Dometic A/C display',
-        'Marine CO alarm',
-        'Reading lights',
-      ],
-      'Master Stateroom': [
-        'Large windows',
-        'Samsung TV',
-        'Hanging closet',
-        'Private head & shower en suite',
-        'Reading & overhead lights',
-        'Carpet flooring',
-      ],
-      'Cockpit & Platform': [
-        'Hydraulic swim platform',
-        'Teak deck',
-        'U-Shape aft deck seating',
-        'Cockpit table with SS pedestal',
-        'Isotherm cockpit refrigerator',
-        'Raritan Ice Maker',
-        'JL Audio speakers',
-        'Fusion MS-NRX300 stereo',
-        'Fresh water wash down',
-        'Whale bilge pump',
-        'Glendinning shore power cable',
-        'Crew quarter hatch',
-      ],
-      'Flybridge': [
-        'Large flybridge — ideal for entertaining',
-        '(2) Sofas on aft flybridge deck',
-        'U-Shape forward sofa with wood table',
-        'Wet bar with grill, sink & Vitrifrigo fridge',
-        'Sunroof',
-        'JL Audio speakers',
-        'Fusion radio',
-        '(2) Raymarine MFD displays',
-        'Raymarine Autopilot',
-        'JoyStick control',
-        'Searchlight control',
-        'SeaKeeper display',
-      ],
-      'Engine Room': [
-        'Twin Volvo Penta diesel engines',
-        'Cummins Onan generator',
-        'Fresh water maker',
-        'Dometic chiller',
-        'Fire extinguisher',
-      ],
-    },
-    photos: [
-      '/listings/azimut-fly-50/photo_01.jpeg',
-      '/listings/azimut-fly-50/photo_06.jpeg',
-      '/listings/azimut-fly-50/photo_07.jpeg',
-      '/listings/azimut-fly-50/photo_08.jpeg',
-      '/listings/azimut-fly-50/photo_09.jpeg',
-      '/listings/azimut-fly-50/photo_10.jpeg',
-      '/listings/azimut-fly-50/photo_11.jpeg',
-      '/listings/azimut-fly-50/photo_12.jpeg',
-      '/listings/azimut-fly-50/photo_13.jpeg',
-      '/listings/azimut-fly-50/photo_14.jpeg',
-      '/listings/azimut-fly-50/photo_15.jpeg',
-      '/listings/azimut-fly-50/photo_16.jpeg',
-      '/listings/azimut-fly-50/photo_17.jpeg',
-      '/listings/azimut-fly-50/photo_18.jpeg',
-      '/listings/azimut-fly-50/photo_19.jpeg',
-      '/listings/azimut-fly-50/photo_20.jpeg',
-      '/listings/azimut-fly-50/photo_21.jpeg',
-      '/listings/azimut-fly-50/photo_22.jpeg',
-      '/listings/azimut-fly-50/photo_23.jpeg',
-      '/listings/azimut-fly-50/photo_24.jpeg',
-    ],
-    video_url: 'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev/sfx%20.mp4',
-    featured: true,
-    status: 'active',
-    salesman_id: 2,
-    seo_title: '2019 Azimut Fly 50 Flybridge For Sale in Miami | Liena Q Perez',
-    seo_description: 'Pristine 2019 Azimut Fly 50 "La Paloma" for sale in Miami, FL. 50ft flybridge yacht with twin Volvo Penta diesels, SeaKeeper stabilizer, 3 staterooms & flybridge bar. $980,000. Contact Liena Q Perez.',
-    seo_keywords: '2019 Azimut Fly 50 for sale,Azimut 50 flybridge Miami,used Azimut yacht Florida,flybridge yacht Miami,50 foot yacht for sale,Azimut Fly 50 price,luxury yacht Miami',
-    created_at: ts,
-    updated_at: ts,
-  };
-
-  const listing2: Listing = {
-    id: 2,
-    slug: '2013-fairline-squadron-65-miami-beach',
-    title: '2013 Fairline Squadron 65',
-    vessel_name: null,
-    year: 2013,
-    make: 'Fairline',
-    model: 'Squadron 65',
-    length_ft: 66,
-    price: 1300000,
-    location: 'Miami Beach, Florida',
-    description: `An extraordinary opportunity to own the iconic 2013 Fairline Squadron 65 — a masterpiece of British yacht-building now available in Miami Beach. Bring all offers on this magnificent 66-foot motor yacht that redefines luxury afloat.
-
-Sumptuous furnishings and hand-worked cabinetry are hallmarks of the Squadron range. Nowhere is it more elegantly expressed than in the long, wide single-level interior — a testament to the 65's ingenious flat floor design that is normally reserved for much larger yachts. An elegant, beautifully proportioned Squadron awaits you.
-
-The massive flybridge features three distinct social areas: a forward chaise longue and sun pad, aft-facing sunbeds, and a seating/dining area. Powered by twin Caterpillar C18-1150 diesels at 1,150hp each producing 32 knots, equipped with Seakeeper gyroscopic stabilizer, bow and stern thrusters, and a full garage for your tender, this vessel is the complete Miami cruising package.`,
-    specs: {
-      'Length Overall': '66 ft 11 in',
-      'Beam': '17 ft 2 in',
-      'Hull Material': 'Fiberglass',
-      'Hull Shape': 'Modified Vee',
-      'Hull Class': 'Motor Yacht',
-      'Year': '2013',
-      'Fuel Type': 'Diesel',
-      'Engine 1': 'CAT C18-1150 Inboard Diesel',
-      'Engine 2': 'CAT C18-1150 Inboard Diesel',
-      'Engine Hours': '690 hrs each',
-      'Total Power': '2,300 hp',
-      'Max Speed': '32 knots',
-      'Fuel Capacity': '936 gallons',
-      'Fresh Water': '305 gallons',
-      'Dry Weight': '32,890 kg',
-      'Stabilizer': 'Seakeeper Gyroscopic',
-      'Condition': 'Used',
-    },
-    features: {
-      'Electronics': [
-        'Garmin navigation system',
-        'Autopilot',
-        'GPS & chartplotter',
-        'Radar & radar detector',
-        'VHF radio',
-        'Depth sounder',
-        'Wi-Fi aboard',
-        'Flat screen TVs',
-        'Cockpit speakers',
-        'Navigation center',
-      ],
-      'Interior Equipment': [
-        'Full air conditioning',
-        'Seakeeper gyroscopic stabilizer',
-        'Bow thruster',
-        'Stern thruster',
-        'Dishwasher',
-        'Washing machine',
-        'Fresh water maker',
-        'Electric bilge pump',
-        'Microwave oven & full oven',
-        'Refrigerator',
-        'Hot water system',
-        'Battery charger',
-        'Marine heads (electric)',
-      ],
-      'Exterior & Deck': [
-        'Teak cockpit',
-        'Teak sidedecks',
-        'Hydraulic hi-lo bathing platform',
-        'Hydraulic gangway',
-        'Cockpit table & cushions',
-        'Cockpit shower',
-        'Davit(s)',
-        'Fin stabilizers',
-        'Swimming ladder',
-        'Underwater lights',
-        'Walk-around deck',
-        'Bimini top',
-      ],
-      'Tender & Toys': [
-        'Full garage for tender',
-        'Yamaha WaveRunner jet ski',
-        'Davits for tender launch',
-        'Outboard engine brackets',
-      ],
-      'Electrical & Safety': [
-        'Generator',
-        'Inverter',
-        'Shore power inlet',
-        'Liferaft',
-        'Fire suppression system',
-        'Solar panel',
-      ],
-    },
-    photos: [
-      '/listings/fairline-squadron-65/photo_02.jpeg',
-      '/listings/fairline-squadron-65/photo_07.jpeg',
-      '/listings/fairline-squadron-65/photo_08.jpeg',
-      '/listings/fairline-squadron-65/photo_09.jpeg',
-      '/listings/fairline-squadron-65/photo_10.jpeg',
-      '/listings/fairline-squadron-65/photo_11.jpeg',
-      '/listings/fairline-squadron-65/photo_12.jpeg',
-      '/listings/fairline-squadron-65/photo_13.jpeg',
-      '/listings/fairline-squadron-65/photo_14.jpeg',
-      '/listings/fairline-squadron-65/photo_15.jpeg',
-      '/listings/fairline-squadron-65/photo_16.jpeg',
-      '/listings/fairline-squadron-65/photo_17.jpeg',
-      '/listings/fairline-squadron-65/photo_18.jpeg',
-      '/listings/fairline-squadron-65/photo_19.jpeg',
-      '/listings/fairline-squadron-65/photo_20.jpeg',
-      '/listings/fairline-squadron-65/photo_21.jpeg',
-      '/listings/fairline-squadron-65/photo_22.jpeg',
-      '/listings/fairline-squadron-65/photo_23.jpeg',
-      '/listings/fairline-squadron-65/photo_24.jpeg',
-    ],
-    video_url: 'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev/Final%20Fairline.mp4',
-    featured: true,
-    status: 'active',
-    salesman_id: 2,
-    seo_title: '2013 Fairline Squadron 65 Motor Yacht For Sale Miami Beach | Liena Q Perez',
-    seo_description: '2013 Fairline Squadron 65 for sale in Miami Beach, FL. 66ft motor yacht with twin CAT 1,150hp engines (690 hrs), Seakeeper, bow & stern thrusters, garage & WaveRunner. $1,300,000. Bring offers. Contact Liena Q Perez.',
-    seo_keywords: '2013 Fairline Squadron 65 for sale,Fairline Squadron 65 Miami Beach,used motor yacht Florida,66 foot yacht for sale,Fairline yacht Miami,luxury motor yacht Miami Beach,Fairline Squadron price',
-    created_at: ts,
-    updated_at: ts,
-  };
-
+function rowToListing(r: Row): Listing {
   return {
-    meta: { lastId: { admins: 2, listings: 2, leads: 0 } },
-    admins: [liena, superAdmin],
-    listings: [listing1, listing2],
-    leads: [],
+    id: Number(r.id),
+    slug: r.slug as string,
+    title: r.title as string,
+    vessel_name: (r.vessel_name as string | null) ?? null,
+    year: Number(r.year),
+    make: r.make as string,
+    model: r.model as string,
+    length_ft: Number(r.length_ft),
+    price: Number(r.price),
+    location: r.location as string,
+    description: r.description as string,
+    specs: (r.specs ?? {}) as Record<string, string>,
+    features: (r.features ?? {}) as Record<string, string[]>,
+    photos: (r.photos ?? []) as string[],
+    video_url: (r.video_url as string | null) ?? null,
+    featured: Boolean(r.featured),
+    status: r.status as 'active' | 'sold' | 'draft',
+    salesman_id: r.salesman_id != null ? Number(r.salesman_id) : null,
+    seo_title: (r.seo_title as string | null) ?? null,
+    seo_description: (r.seo_description as string | null) ?? null,
+    seo_keywords: (r.seo_keywords as string | null) ?? null,
+    created_at: toStr(r.created_at),
+    updated_at: toStr(r.updated_at),
   };
 }
 
-// ── Listing helpers ───────────────────────────────────────────────────────────
+function rowToAdmin(r: Row): Admin {
+  return {
+    id: Number(r.id),
+    username: r.username as string,
+    password_hash: (r.password_hash as string) ?? '',
+    email: (r.email as string | null) ?? null,
+    role: r.role as 'broker' | 'salesman',
+    name: (r.name as string | null) ?? null,
+    phone: (r.phone as string | null) ?? null,
+    created_at: toStr(r.created_at),
+  };
+}
+
+function rowToLead(r: Row): Lead {
+  return {
+    id: Number(r.id),
+    name: r.name as string,
+    email: r.email as string,
+    phone: r.phone as string,
+    message: (r.message as string | null) ?? null,
+    listing_id: r.listing_id != null ? Number(r.listing_id) : null,
+    listing_title: (r.listing_title as string | null) ?? null,
+    created_at: toStr(r.created_at),
+  };
+}
+
+// ── Slug helper ───────────────────────────────────────────────────────────────
 
 function slugify(text: string): string {
   return text
@@ -434,159 +147,270 @@ function slugify(text: string): string {
     .trim();
 }
 
-export function getAllListings(): Listing[] {
-  const { listings } = readDb();
-  return listings
-    .filter((l) => l.status !== 'draft')
-    .sort((a, b) => {
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
+// ── Listing queries ───────────────────────────────────────────────────────────
+
+export async function getAllListings(): Promise<Listing[]> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM listings
+    WHERE status != 'draft'
+    ORDER BY featured DESC, created_at DESC
+  `;
+  return rows.map(rowToListing);
 }
 
-export function getAllListingsAdmin(): Listing[] {
-  const { listings } = readDb();
-  return listings.sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+export async function getAllListingsAdmin(): Promise<Listing[]> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM listings
+    ORDER BY created_at DESC
+  `;
+  return rows.map(rowToListing);
 }
 
-export function getListingsBySalesman(salesmanId: number): Listing[] {
-  const { listings } = readDb();
-  return listings
-    .filter((l) => l.salesman_id === salesmanId)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+export async function getListingsBySalesman(salesmanId: number): Promise<Listing[]> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM listings
+    WHERE salesman_id = ${salesmanId}
+    ORDER BY created_at DESC
+  `;
+  return rows.map(rowToListing);
 }
 
-export function getFeaturedListings(): Listing[] {
-  const { listings } = readDb();
-  return listings.filter((l) => l.featured && l.status === 'active');
+export async function getFeaturedListings(): Promise<Listing[]> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM listings
+    WHERE featured = true AND status = 'active'
+    ORDER BY created_at DESC
+  `;
+  return rows.map(rowToListing);
 }
 
-export function getListingBySlug(slug: string): Listing | null {
-  const { listings } = readDb();
-  return listings.find((l) => l.slug === slug) ?? null;
+export async function getListingBySlug(slug: string): Promise<Listing | null> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM listings WHERE slug = ${slug} LIMIT 1
+  `;
+  return rows.length > 0 ? rowToListing(rows[0]) : null;
 }
 
-export function getListingById(id: number): Listing | null {
-  const { listings } = readDb();
-  return listings.find((l) => l.id === id) ?? null;
+export async function getListingById(id: number): Promise<Listing | null> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM listings WHERE id = ${id} LIMIT 1
+  `;
+  return rows.length > 0 ? rowToListing(rows[0]) : null;
 }
 
-export function createListing(
+export async function createListing(
   data: Omit<Listing, 'id' | 'created_at' | 'updated_at'>
-): { id: number; slug: string } {
-  const db = readDb();
+): Promise<{ id: number; slug: string }> {
+  const sql = getDb();
 
   // Ensure unique slug
   const baseSlug = slugify(data.slug || data.title);
   let slug = baseSlug;
   let attempt = 1;
-  while (db.listings.some((l) => l.slug === slug)) {
+  while (true) {
+    const existing = await sql`SELECT id FROM listings WHERE slug = ${slug} LIMIT 1`;
+    if (existing.length === 0) break;
     slug = `${baseSlug}-${++attempt}`;
   }
 
-  const id = nextId(db, 'listings');
-  const ts = now();
+  const rows = await sql`
+    INSERT INTO listings (
+      slug, title, vessel_name, year, make, model, length_ft, price, location,
+      description, specs, features, photos, video_url, featured, status,
+      salesman_id, seo_title, seo_description, seo_keywords
+    ) VALUES (
+      ${slug},
+      ${data.title},
+      ${data.vessel_name ?? null},
+      ${data.year},
+      ${data.make},
+      ${data.model},
+      ${data.length_ft},
+      ${data.price},
+      ${data.location},
+      ${data.description},
+      ${JSON.stringify(data.specs)}::jsonb,
+      ${JSON.stringify(data.features)}::jsonb,
+      ${JSON.stringify(data.photos)}::jsonb,
+      ${data.video_url ?? null},
+      ${data.featured},
+      ${data.status},
+      ${data.salesman_id ?? null},
+      ${data.seo_title ?? null},
+      ${data.seo_description ?? null},
+      ${data.seo_keywords ?? null}
+    )
+    RETURNING id, slug
+  `;
 
-  db.listings.push({ ...data, id, slug, created_at: ts, updated_at: ts });
-  writeDb(db);
-  return { id, slug };
+  return { id: Number(rows[0].id), slug: rows[0].slug as string };
 }
 
-export function updateListing(
+export async function updateListing(
   id: number,
   data: Partial<Omit<Listing, 'id' | 'created_at'>>
-): boolean {
-  const db = readDb();
-  const idx = db.listings.findIndex((l) => l.id === id);
-  if (idx === -1) return false;
-  db.listings[idx] = { ...db.listings[idx], ...data, updated_at: now() };
-  writeDb(db);
-  return true;
+): Promise<boolean> {
+  const sql = getDb();
+  const rows = await sql`
+    UPDATE listings SET
+      title           = ${data.title ?? null},
+      vessel_name     = ${data.vessel_name ?? null},
+      year            = ${data.year ?? null},
+      make            = ${data.make ?? null},
+      model           = ${data.model ?? null},
+      length_ft       = ${data.length_ft ?? null},
+      price           = ${data.price ?? null},
+      location        = ${data.location ?? null},
+      description     = ${data.description ?? null},
+      specs           = ${JSON.stringify(data.specs ?? {})}::jsonb,
+      features        = ${JSON.stringify(data.features ?? {})}::jsonb,
+      photos          = ${JSON.stringify(data.photos ?? [])}::jsonb,
+      video_url       = ${data.video_url ?? null},
+      featured        = ${data.featured ?? false},
+      status          = ${data.status ?? null},
+      salesman_id     = ${data.salesman_id ?? null},
+      seo_title       = ${data.seo_title ?? null},
+      seo_description = ${data.seo_description ?? null},
+      seo_keywords    = ${data.seo_keywords ?? null},
+      updated_at      = NOW()
+    WHERE id = ${id}
+    RETURNING id
+  `;
+  return rows.length > 0;
 }
 
-export function deleteListing(id: number): boolean {
-  const db = readDb();
-  const before = db.listings.length;
-  db.listings = db.listings.filter((l) => l.id !== id);
-  if (db.listings.length === before) return false;
-  writeDb(db);
-  return true;
+export async function deleteListing(id: number): Promise<boolean> {
+  const sql = getDb();
+  const rows = await sql`DELETE FROM listings WHERE id = ${id} RETURNING id`;
+  return rows.length > 0;
 }
 
-// ── Admin helpers ─────────────────────────────────────────────────────────────
+// ── Admin queries ─────────────────────────────────────────────────────────────
 
-export function getAdminByUsername(username: string): Admin | null {
-  const { admins } = readDb();
-  return admins.find((a) => a.username === username.toLowerCase()) ?? null;
+export async function getAdminByUsername(username: string): Promise<Admin | null> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM admins WHERE username = ${username.toLowerCase()} LIMIT 1
+  `;
+  return rows.length > 0 ? rowToAdmin(rows[0]) : null;
 }
 
-export function getAdminById(id: number): Admin | null {
-  const { admins } = readDb();
-  return admins.find((a) => a.id === id) ?? null;
+export async function getAdminById(id: number): Promise<Admin | null> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM admins WHERE id = ${id} LIMIT 1
+  `;
+  return rows.length > 0 ? rowToAdmin(rows[0]) : null;
 }
 
-export function getAllAdmins(): Admin[] {
-  const { admins } = readDb();
+export async function getAllAdmins(): Promise<Admin[]> {
+  const sql = getDb();
+  const rows = await sql`SELECT * FROM admins ORDER BY created_at ASC`;
   // Strip password hashes from list view
-  return admins.map(({ password_hash: _, ...rest }) => ({ ...rest, password_hash: '' }));
+  return rows.map((r) => ({ ...rowToAdmin(r), password_hash: '' }));
 }
 
-// ── Lead helpers ──────────────────────────────────────────────────────────────
-
-export function createLead(data: Omit<Lead, 'id' | 'created_at'>): Lead {
-  const db = readDb();
-  const id = nextId(db, 'leads');
-  const lead: Lead = { ...data, id, created_at: now() };
-  db.leads.push(lead);
-  writeDb(db);
-  return lead;
-}
-
-export function getAllLeads(): Lead[] {
-  const { leads } = readDb();
-  return leads.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-}
-
-export function getLeadsByListingIds(listingIds: number[]): Lead[] {
-  const { leads } = readDb();
-  return leads
-    .filter((l) => l.listing_id !== null && listingIds.includes(l.listing_id))
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-}
-
-export function createAdmin(data: Omit<Admin, 'id' | 'created_at'>): Admin {
-  const db = readDb();
-  if (db.admins.some((a) => a.username === data.username.toLowerCase())) {
-    throw new Error('Username already exists');
+export async function createAdmin(data: Omit<Admin, 'id' | 'created_at'>): Promise<Admin> {
+  const sql = getDb();
+  try {
+    const rows = await sql`
+      INSERT INTO admins (username, password_hash, email, role, name, phone)
+      VALUES (
+        ${data.username.toLowerCase()},
+        ${data.password_hash},
+        ${data.email ?? null},
+        ${data.role},
+        ${data.name ?? null},
+        ${data.phone ?? null}
+      )
+      RETURNING *
+    `;
+    return rowToAdmin(rows[0]);
+  } catch (err: unknown) {
+    // Postgres unique constraint violation
+    if ((err as { code?: string }).code === '23505') {
+      throw new Error('Username already exists');
+    }
+    throw err;
   }
-  const id = nextId(db, 'admins');
-  const admin: Admin = { ...data, id, username: data.username.toLowerCase(), created_at: now() };
-  db.admins.push(admin);
-  writeDb(db);
-  return admin;
 }
 
-export function updateAdmin(
+export async function updateAdmin(
   id: number,
   data: Partial<Omit<Admin, 'id' | 'created_at'>>
-): boolean {
-  const db = readDb();
-  const idx = db.admins.findIndex((a) => a.id === id);
-  if (idx === -1) return false;
-  if (data.username) data.username = data.username.toLowerCase();
-  db.admins[idx] = { ...db.admins[idx], ...data };
-  writeDb(db);
-  return true;
+): Promise<boolean> {
+  // Fetch existing to merge partial updates
+  const existing = await getAdminById(id);
+  if (!existing) return false;
+
+  const merged = {
+    username: data.username ? data.username.toLowerCase() : existing.username,
+    password_hash: data.password_hash ?? existing.password_hash,
+    email: data.email !== undefined ? data.email : existing.email,
+    role: data.role ?? existing.role,
+    name: data.name !== undefined ? data.name : existing.name,
+    phone: data.phone !== undefined ? data.phone : existing.phone,
+  };
+
+  const sql = getDb();
+  const rows = await sql`
+    UPDATE admins SET
+      username      = ${merged.username},
+      password_hash = ${merged.password_hash},
+      email         = ${merged.email ?? null},
+      role          = ${merged.role},
+      name          = ${merged.name ?? null},
+      phone         = ${merged.phone ?? null}
+    WHERE id = ${id}
+    RETURNING id
+  `;
+  return rows.length > 0;
 }
 
-export function deleteAdmin(id: number): boolean {
-  const db = readDb();
-  const before = db.admins.length;
-  db.admins = db.admins.filter((a) => a.id !== id);
-  if (db.admins.length === before) return false;
-  writeDb(db);
-  return true;
+export async function deleteAdmin(id: number): Promise<boolean> {
+  const sql = getDb();
+  const rows = await sql`DELETE FROM admins WHERE id = ${id} RETURNING id`;
+  return rows.length > 0;
+}
+
+// ── Lead queries ──────────────────────────────────────────────────────────────
+
+export async function createLead(data: Omit<Lead, 'id' | 'created_at'>): Promise<Lead> {
+  const sql = getDb();
+  const rows = await sql`
+    INSERT INTO leads (name, email, phone, message, listing_id, listing_title)
+    VALUES (
+      ${data.name},
+      ${data.email},
+      ${data.phone},
+      ${data.message ?? null},
+      ${data.listing_id ?? null},
+      ${data.listing_title ?? null}
+    )
+    RETURNING *
+  `;
+  return rowToLead(rows[0]);
+}
+
+export async function getAllLeads(): Promise<Lead[]> {
+  const sql = getDb();
+  const rows = await sql`SELECT * FROM leads ORDER BY created_at DESC`;
+  return rows.map(rowToLead);
+}
+
+export async function getLeadsByListingIds(listingIds: number[]): Promise<Lead[]> {
+  if (listingIds.length === 0) return [];
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM leads
+    WHERE listing_id = ANY(${listingIds}::int[])
+    ORDER BY created_at DESC
+  `;
+  return rows.map(rowToLead);
 }

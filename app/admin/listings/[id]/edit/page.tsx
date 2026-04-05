@@ -14,15 +14,17 @@ export default async function EditListingPage({ params }: PageProps) {
   const auth = await getAuthFromCookies();
   if (!auth) redirect('/admin/login');
 
-  const listing = getListingById(parseInt(params.id));
+  const [listing, admins] = await Promise.all([
+    getListingById(parseInt(params.id)),
+    auth.role === 'broker' ? getAllAdmins() : Promise.resolve([]),
+  ]);
+
   if (!listing) notFound();
 
   // Salesmen can only edit their own listings
   if (auth.role === 'salesman' && listing.salesman_id !== auth.adminId) {
     redirect('/admin/dashboard');
   }
-
-  const admins = auth.role === 'broker' ? getAllAdmins() : [];
 
   return (
     <div className="min-h-screen bg-[#060f1c]">

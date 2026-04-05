@@ -11,7 +11,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const id = parseInt(params.id, 10);
   if (isNaN(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
 
-  const existing = getAdminById(id);
+  const existing = await getAdminById(id);
   if (!existing) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
   try {
@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (body.role && ['broker', 'salesman'].includes(body.role)) updates.role = body.role;
     if (body.password) updates.password_hash = bcrypt.hashSync(body.password, 10);
 
-    updateAdmin(id, updates as Parameters<typeof updateAdmin>[1]);
+    await updateAdmin(id, updates as Parameters<typeof updateAdmin>[1]);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
@@ -44,7 +44,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 });
   }
 
-  const deleted = deleteAdmin(id);
+  const deleted = await deleteAdmin(id);
   if (!deleted) return NextResponse.json({ error: 'User not found' }, { status: 404 });
   return NextResponse.json({ success: true });
 }

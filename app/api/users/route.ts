@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (auth.role !== 'broker') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const admins = getAllAdmins();
+  const admins = await getAllAdmins();
   return NextResponse.json(admins);
 }
 
@@ -29,7 +29,14 @@ export async function POST(req: NextRequest) {
     }
 
     const password_hash = bcrypt.hashSync(password, 10);
-    const admin = createAdmin({ username, password_hash, name: name || null, email: email || null, phone: phone || null, role });
+    const admin = await createAdmin({
+      username,
+      password_hash,
+      name: name || null,
+      email: email || null,
+      phone: phone || null,
+      role,
+    });
 
     return NextResponse.json({ id: admin.id, username: admin.username }, { status: 201 });
   } catch (err: unknown) {

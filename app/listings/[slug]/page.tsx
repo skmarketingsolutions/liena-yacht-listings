@@ -14,12 +14,17 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const listings = getAllListings();
-  return listings.map((l) => ({ slug: l.slug }));
+  try {
+    const listings = await getAllListings();
+    return listings.map((l) => ({ slug: l.slug }));
+  } catch {
+    // DB not available at build time — pages will be rendered on demand
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const listing = getListingBySlug(params.slug);
+  const listing = await getListingBySlug(params.slug);
   if (!listing) return {};
 
   const title = listing.seo_title || `${listing.title} For Sale | Liena Q Perez`;
@@ -45,14 +50,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
 }
 
-export default function ListingPage({ params }: PageProps) {
-  const listing = getListingBySlug(params.slug);
+export default async function ListingPage({ params }: PageProps) {
+  const listing = await getListingBySlug(params.slug);
   if (!listing) notFound();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lienayperez.com';

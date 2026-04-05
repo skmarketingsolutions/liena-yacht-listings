@@ -5,7 +5,7 @@ import { getAllListings, createListing } from '@/lib/db';
 // GET /api/listings — public
 export async function GET() {
   try {
-    return NextResponse.json(getAllListings());
+    return NextResponse.json(await getAllListings());
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { id, slug } = createListing({
+    const { id, slug } = await createListing({
       slug: body.slug || body.title || 'listing',
       title: body.title,
       vessel_name: body.vessel_name || null,

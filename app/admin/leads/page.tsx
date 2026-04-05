@@ -7,7 +7,10 @@ import { Mail, Phone, MessageSquare } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 function fmt(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
 }
 
 export default async function LeadsPage() {
@@ -16,10 +19,10 @@ export default async function LeadsPage() {
 
   let leads;
   if (auth.role === 'broker') {
-    leads = getAllLeads();
+    leads = await getAllLeads();
   } else {
-    const myListings = getListingsBySalesman(auth.adminId);
-    leads = getLeadsByListingIds(myListings.map((l) => l.id));
+    const myListings = await getListingsBySalesman(auth.adminId);
+    leads = await getLeadsByListingIds(myListings.map((l) => l.id));
   }
 
   return (

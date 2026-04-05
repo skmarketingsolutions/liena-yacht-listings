@@ -1,0 +1,239 @@
+/**
+ * POST /api/admin/seed?secret=SEED_SECRET
+ *
+ * Creates Postgres tables (if they don't exist) and inserts seed data
+ * (admins + listings) only when each table is empty.
+ * Call this once after setting DATABASE_URL in Vercel.
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
+
+export async function POST(req: NextRequest) {
+  // ── Auth ─────────────────────────────────────────────────────────────────────
+  const url = new URL(req.url);
+  const secret = url.searchParams.get('secret');
+  const expected = process.env.SEED_SECRET;
+
+  if (!expected || secret !== expected) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 });
+  }
+
+  const sql = neon(process.env.DATABASE_URL);
+
+  try {
+    // ── Create tables ─────────────────────────────────────────────────────────
+    await sql`
+      CREATE TABLE IF NOT EXISTS admins (
+        id            SERIAL       PRIMARY KEY,
+        username      VARCHAR(50)  UNIQUE NOT NULL,
+        password_hash TEXT         NOT NULL,
+        email         VARCHAR(255),
+        role          VARCHAR(20)  NOT NULL DEFAULT 'salesman',
+        name          VARCHAR(255),
+        phone         VARCHAR(50),
+        created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+      )
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS listings (
+        id              SERIAL        PRIMARY KEY,
+        slug            VARCHAR(255)  UNIQUE NOT NULL,
+        title           VARCHAR(500)  NOT NULL,
+        vessel_name     VARCHAR(255),
+        year            INTEGER       NOT NULL,
+        make            VARCHAR(255)  NOT NULL,
+        model           VARCHAR(255)  NOT NULL,
+        length_ft       NUMERIC(10,2) NOT NULL,
+        price           NUMERIC(15,2) NOT NULL,
+        location        VARCHAR(255)  NOT NULL,
+        description     TEXT          NOT NULL,
+        specs           JSONB         NOT NULL DEFAULT '{}',
+        features        JSONB         NOT NULL DEFAULT '{}',
+        photos          JSONB         NOT NULL DEFAULT '[]',
+        video_url       TEXT,
+        featured        BOOLEAN       NOT NULL DEFAULT false,
+        status          VARCHAR(20)   NOT NULL DEFAULT 'active',
+        salesman_id     INTEGER,
+        seo_title       VARCHAR(500),
+        seo_description TEXT,
+        seo_keywords    TEXT,
+        created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+        updated_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+      )
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS leads (
+        id            SERIAL       PRIMARY KEY,
+        name          VARCHAR(255) NOT NULL,
+        email         VARCHAR(255) NOT NULL,
+        phone         VARCHAR(50)  NOT NULL,
+        message       TEXT,
+        listing_id    INTEGER,
+        listing_title VARCHAR(500),
+        created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+      )
+    `;
+
+    // ── Seed admins (only if empty) ───────────────────────────────────────────
+    const [{ n: adminCount }] = await sql`SELECT COUNT(*)::int AS n FROM admins`;
+    let adminsSeeded = 0;
+
+    if (Number(adminCount) === 0) {
+      // Hashes from live db.json — liena: LienaQ2024!  admin: Admin2024!
+      const lienaHash = '$2a$10$18n.mrKd/9DmjmJ3kgA5c.PksVa/wOrBKDyYaTIFjaO7sSNX2C3jW';
+      const adminHash = '$2a$10$YHttYogNjvAk9wlO4b.BQukQXD/lebRiNJe0E9RNOrHrDWjWv5dLy';
+      const ts = '2026-04-04T20:27:46.752Z';
+
+      await sql`
+        INSERT INTO admins (id, username, password_hash, email, role, name, phone, created_at)
+        VALUES (1, 'liena', ${lienaHash}, 'liena@italiaboats.com', 'salesman', 'Liena Q Perez', '786-838-9911', ${ts})
+      `;
+      await sql`
+        INSERT INTO admins (id, username, password_hash, email, role, name, phone, created_at)
+        VALUES (2, 'admin', ${adminHash}, 'liena@italiaboats.com', 'broker', 'Admin', '786-838-9911', ${ts})
+      `;
+      await sql`SELECT setval('admins_id_seq', 2, true)`;
+      adminsSeeded = 2;
+    }
+
+    // ── Seed listings (only if empty) ─────────────────────────────────────────
+    const [{ n: listingCount }] = await sql`SELECT COUNT(*)::int AS n FROM listings`;
+    let listingsSeeded = 0;
+
+    if (Number(listingCount) === 0) {
+      const ts = '2026-04-04T20:27:46.752Z';
+
+      // ── Azimut Fly 50 ────────────────────────────────────────────────────────
+      const azDesc = `Introducing the stunning 2019 Azimut Fly 50 "La Paloma" — a remarkable flybridge yacht that embodies Italian elegance and performance. With an overall length of 50 feet, this vessel is crafted from durable fiberglass and powered by twin Volvo Penta inboard diesel engines, promising a reliable and exhilarating cruising experience.
+
+The Fly 50 is designed for comfort and style, featuring a spacious layout that enhances your time spent at sea. The flybridge offers an ideal vantage point for enjoying breathtaking views while relaxing with friends and family. Equipped with a SeaKeeper gyroscopic stabilizer, Raymarine electronics suite, and JoyStick docking control, this yacht handles like a dream in Miami's waters.
+
+Three beautifully appointed staterooms accommodate up to 6 guests, while the fully-equipped galley with Miele appliances ensures gourmet meals at anchor. The expansive flybridge with wet bar, grill, and U-shaped seating makes this the ultimate Miami entertainment vessel.`;
+
+      const azSpecs = JSON.stringify({
+        'Length Overall':'50 ft','Beam':'15 ft 3 in','Max Draft':'4 ft 11 in',
+        'Hull Material':'Fiberglass','Hull Class':'Flybridge','Year':'2019',
+        'Fuel Type':'Diesel','Engine 1':'Volvo Penta Inboard Diesel',
+        'Engine 2':'Volvo Penta Inboard Diesel','Stabilizer':'SeaKeeper Gyro','Condition':'Used',
+      });
+      const azFeatures = JSON.stringify({
+        'Salon':['Wood flooring throughout','Port & starboard salon sofas','Hi-Low table on starboard side','Bose sound system','Sony 4K 3D BluRay','Dometic A/C electronic display','Large panoramic windows'],
+        'Galley':['Galley located aft salon port side','Large countertop with wood flooring','Vitrifrigo undercounter refrigerator','Miele Microwave/Oven','Miele Induction cooktop','Stainless steel sink'],
+        'Electronics':['(2) Twin Raymarine MFD displays','Raymarine Autopilot','JoyStick docking control','Raymarine VHF Radio','SeaKeeper display','Sea-Fire shutdown system','Raymarine Radar','Volvo Penta engine display'],
+        'Companionway':['Splendide washer & dryer','Vitrifrigo refrigerator'],
+        'Forward VIP Stateroom':['Centerline queen bed','Bose sound system','Samsung TV','Dometic A/C electronic display','(2) Hanging closets','Emergency escape hatch','Marine CO alarm','Reading lights'],
+        'Guest Stateroom':['(2) Single beds with mattresses','Carpet flooring','Hanging closet','Dometic A/C display','Marine CO alarm','Reading lights'],
+        'Master Stateroom':['Large windows','Samsung TV','Hanging closet','Private head & shower en suite','Reading & overhead lights','Carpet flooring'],
+        'Cockpit & Platform':['Hydraulic swim platform','Teak deck','U-Shape aft deck seating','Cockpit table with SS pedestal','Isotherm cockpit refrigerator','Raritan Ice Maker','JL Audio speakers','Fusion MS-NRX300 stereo','Fresh water wash down','Whale bilge pump','Glendinning shore power cable','Crew quarter hatch'],
+        'Flybridge':['Large flybridge — ideal for entertaining','(2) Sofas on aft flybridge deck','U-Shape forward sofa with wood table','Wet bar with grill, sink & Vitrifrigo fridge','Sunroof','JL Audio speakers','Fusion radio','(2) Raymarine MFD displays','Raymarine Autopilot','JoyStick control','Searchlight control','SeaKeeper display'],
+        'Engine Room':['Twin Volvo Penta diesel engines','Cummins Onan generator','Fresh water maker','Dometic chiller','Fire extinguisher'],
+      });
+      const azPhotos = JSON.stringify([
+        '/listings/azimut-fly-50/photo_01.jpeg','/listings/azimut-fly-50/photo_06.jpeg',
+        '/listings/azimut-fly-50/photo_07.jpeg','/listings/azimut-fly-50/photo_08.jpeg',
+        '/listings/azimut-fly-50/photo_09.jpeg','/listings/azimut-fly-50/photo_10.jpeg',
+        '/listings/azimut-fly-50/photo_11.jpeg','/listings/azimut-fly-50/photo_12.jpeg',
+        '/listings/azimut-fly-50/photo_13.jpeg','/listings/azimut-fly-50/photo_14.jpeg',
+        '/listings/azimut-fly-50/photo_15.jpeg','/listings/azimut-fly-50/photo_16.jpeg',
+        '/listings/azimut-fly-50/photo_17.jpeg','/listings/azimut-fly-50/photo_18.jpeg',
+        '/listings/azimut-fly-50/photo_19.jpeg','/listings/azimut-fly-50/photo_20.jpeg',
+        '/listings/azimut-fly-50/photo_21.jpeg','/listings/azimut-fly-50/photo_22.jpeg',
+        '/listings/azimut-fly-50/photo_23.jpeg','/listings/azimut-fly-50/photo_24.jpeg',
+      ]);
+
+      await sql`
+        INSERT INTO listings (id, slug, title, vessel_name, year, make, model, length_ft, price,
+          location, description, specs, features, photos, video_url, featured, status,
+          salesman_id, seo_title, seo_description, seo_keywords, created_at, updated_at)
+        VALUES (
+          1, '2019-azimut-fly-50-miami', '2019 Azimut Fly 50 — La Paloma', 'La Paloma',
+          2019, 'Azimut', 'Fly 50', 50, 980000, 'Miami, Florida',
+          ${azDesc},
+          ${azSpecs}::jsonb, ${azFeatures}::jsonb, ${azPhotos}::jsonb,
+          'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev/sfx%20.mp4',
+          true, 'active', 1,
+          '2019 Azimut Fly 50 Flybridge For Sale in Miami | Liena Q Perez',
+          'Pristine 2019 Azimut Fly 50 "La Paloma" for sale in Miami, FL. 50ft flybridge yacht with twin Volvo Penta diesels, SeaKeeper stabilizer, 3 staterooms & flybridge bar. $980,000. Contact Liena Q Perez.',
+          '2019 Azimut Fly 50 for sale,Azimut 50 flybridge Miami,used Azimut yacht Florida,flybridge yacht Miami,50 foot yacht for sale,Azimut Fly 50 price,luxury yacht Miami',
+          ${ts}, ${ts}
+        )
+      `;
+
+      // ── Fairline Squadron 65 ─────────────────────────────────────────────────
+      const flDesc = `An extraordinary opportunity to own the iconic 2013 Fairline Squadron 65 — a masterpiece of British yacht-building now available in Miami Beach. Bring all offers on this magnificent 66-foot motor yacht that redefines luxury afloat.
+
+Sumptuous furnishings and hand-worked cabinetry are hallmarks of the Squadron range. Nowhere is it more elegantly expressed than in the long, wide single-level interior — a testament to the 65's ingenious flat floor design that is normally reserved for much larger yachts. An elegant, beautifully proportioned Squadron awaits you.
+
+The massive flybridge features three distinct social areas: a forward chaise longue and sun pad, aft-facing sunbeds, and a seating/dining area. Powered by twin Caterpillar C18-1150 diesels at 1,150hp each producing 32 knots, equipped with Seakeeper gyroscopic stabilizer, bow and stern thrusters, and a full garage for your tender, this vessel is the complete Miami cruising package.`;
+
+      const flSpecs = JSON.stringify({
+        'Length Overall':'66 ft 11 in','Beam':'17 ft 2 in','Hull Material':'Fiberglass',
+        'Hull Shape':'Modified Vee','Hull Class':'Motor Yacht','Year':'2013',
+        'Fuel Type':'Diesel','Engine 1':'CAT C18-1150 Inboard Diesel',
+        'Engine 2':'CAT C18-1150 Inboard Diesel','Engine Hours':'690 hrs each',
+        'Total Power':'2,300 hp','Max Speed':'32 knots','Fuel Capacity':'936 gallons',
+        'Fresh Water':'305 gallons','Dry Weight':'32,890 kg',
+        'Stabilizer':'Seakeeper Gyroscopic','Condition':'Used',
+      });
+      const flFeatures = JSON.stringify({
+        'Electronics':['Garmin navigation system','Autopilot','GPS & chartplotter','Radar & radar detector','VHF radio','Depth sounder','Wi-Fi aboard','Flat screen TVs','Cockpit speakers','Navigation center'],
+        'Interior Equipment':['Full air conditioning','Seakeeper gyroscopic stabilizer','Bow thruster','Stern thruster','Dishwasher','Washing machine','Fresh water maker','Electric bilge pump','Microwave oven & full oven','Refrigerator','Hot water system','Battery charger','Marine heads (electric)'],
+        'Exterior & Deck':['Teak cockpit','Teak sidedecks','Hydraulic hi-lo bathing platform','Hydraulic gangway','Cockpit table & cushions','Cockpit shower','Davit(s)','Fin stabilizers','Swimming ladder','Underwater lights','Walk-around deck','Bimini top'],
+        'Tender & Toys':['Full garage for tender','Yamaha WaveRunner jet ski','Davits for tender launch','Outboard engine brackets'],
+        'Electrical & Safety':['Generator','Inverter','Shore power inlet','Liferaft','Fire suppression system','Solar panel'],
+      });
+      const flPhotos = JSON.stringify([
+        '/listings/fairline-squadron-65/photo_02.jpeg','/listings/fairline-squadron-65/photo_07.jpeg',
+        '/listings/fairline-squadron-65/photo_08.jpeg','/listings/fairline-squadron-65/photo_09.jpeg',
+        '/listings/fairline-squadron-65/photo_10.jpeg','/listings/fairline-squadron-65/photo_11.jpeg',
+        '/listings/fairline-squadron-65/photo_12.jpeg','/listings/fairline-squadron-65/photo_13.jpeg',
+        '/listings/fairline-squadron-65/photo_14.jpeg','/listings/fairline-squadron-65/photo_15.jpeg',
+        '/listings/fairline-squadron-65/photo_16.jpeg','/listings/fairline-squadron-65/photo_17.jpeg',
+        '/listings/fairline-squadron-65/photo_18.jpeg','/listings/fairline-squadron-65/photo_19.jpeg',
+        '/listings/fairline-squadron-65/photo_20.jpeg','/listings/fairline-squadron-65/photo_21.jpeg',
+        '/listings/fairline-squadron-65/photo_22.jpeg','/listings/fairline-squadron-65/photo_23.jpeg',
+        '/listings/fairline-squadron-65/photo_24.jpeg',
+      ]);
+
+      await sql`
+        INSERT INTO listings (id, slug, title, vessel_name, year, make, model, length_ft, price,
+          location, description, specs, features, photos, video_url, featured, status,
+          salesman_id, seo_title, seo_description, seo_keywords, created_at, updated_at)
+        VALUES (
+          2, '2013-fairline-squadron-65-miami-beach', '2013 Fairline Squadron 65', NULL,
+          2013, 'Fairline', 'Squadron 65', 66, 1300000, 'Miami Beach, Florida',
+          ${flDesc},
+          ${flSpecs}::jsonb, ${flFeatures}::jsonb, ${flPhotos}::jsonb,
+          'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev/Final%20Fairline.mp4',
+          true, 'active', 1,
+          '2013 Fairline Squadron 65 Motor Yacht For Sale Miami Beach | Liena Q Perez',
+          '2013 Fairline Squadron 65 for sale in Miami Beach, FL. 66ft motor yacht with twin CAT 1,150hp engines (690 hrs), Seakeeper, bow & stern thrusters, garage & WaveRunner. $1,300,000. Bring offers. Contact Liena Q Perez.',
+          '2013 Fairline Squadron 65 for sale,Fairline Squadron 65 Miami Beach,used motor yacht Florida,66 foot yacht for sale,Fairline yacht Miami,luxury motor yacht Miami Beach,Fairline Squadron price',
+          ${ts}, ${ts}
+        )
+      `;
+
+      await sql`SELECT setval('listings_id_seq', 2, true)`;
+      listingsSeeded = 2;
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Database ready',
+      adminsSeeded,
+      listingsSeeded,
+    });
+  } catch (err) {
+    console.error('[Seed]', err);
+    return NextResponse.json(
+      { error: 'Seed failed', detail: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
+}

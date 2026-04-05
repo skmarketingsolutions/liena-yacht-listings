@@ -5,7 +5,6 @@ import {
   getAllListingsAdmin,
   getListingsBySalesman,
   getAllAdmins,
-  getAdminById,
   type Listing,
 } from '@/lib/db';
 import AdminNav from '@/components/AdminNav';
@@ -25,18 +24,20 @@ export default async function DashboardPage() {
   const auth = await getAuthFromCookies();
   if (!auth) redirect('/admin/login');
 
-  const listings =
+  const [listings, admins] = await Promise.all([
     auth.role === 'broker'
       ? getAllListingsAdmin()
-      : getListingsBySalesman(auth.adminId);
+      : getListingsBySalesman(auth.adminId),
+    auth.role === 'broker' ? getAllAdmins() : Promise.resolve([]),
+  ]);
 
-  // Attach salesman name to each listing for broker view
+  // Build a salesman name lookup from the admins list (no extra DB queries)
+  const adminMap = Object.fromEntries(admins.map((a) => [a.id, a.name ?? a.username]));
+
   const listingsWithSalesman = listings.map((l) => ({
     ...l,
-    salesman_name: l.salesman_id ? getAdminById(l.salesman_id)?.name ?? '—' : '—',
+    salesman_name: l.salesman_id ? (adminMap[l.salesman_id] ?? '—') : '—',
   }));
-
-  const admins = auth.role === 'broker' ? getAllAdmins() : [];
 
   const stats = {
     total: listings.length,

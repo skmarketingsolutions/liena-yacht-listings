@@ -7,12 +7,12 @@ export async function GET(req: NextRequest) {
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   if (auth.role === 'broker') {
-    return NextResponse.json(getAllLeads());
+    return NextResponse.json(await getAllLeads());
   }
 
   // Salesman: only leads for their listings
-  const myListings = getListingsBySalesman(auth.adminId);
+  const myListings = await getListingsBySalesman(auth.adminId);
   const myIds = myListings.map((l) => l.id);
-  const leads = getLeadsByListingIds(myIds);
+  const leads = await getLeadsByListingIds(myIds);
   return NextResponse.json(leads);
 }

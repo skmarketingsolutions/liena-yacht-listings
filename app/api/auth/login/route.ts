@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Username and password are required.' }, { status: 400 });
     }
 
-    const admin = getAdminByUsername(username.trim().toLowerCase());
+    const admin = await getAdminByUsername(username.trim().toLowerCase());
 
     if (!admin) {
       return NextResponse.json({ error: 'Invalid username or password.' }, { status: 401 });

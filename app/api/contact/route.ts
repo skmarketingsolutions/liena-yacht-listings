@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Save lead
-    createLead({
+    await createLead({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
     let toEmail = process.env.LEAD_EMAIL || 'liena@italiaboats.com';
 
     if (listingId) {
-      const listing = getListingById(Number(listingId));
+      const listing = await getListingById(Number(listingId));
       if (listing?.salesman_id) {
-        const salesman = getAdminById(listing.salesman_id);
+        const salesman = await getAdminById(listing.salesman_id);
         if (salesman?.email) toEmail = salesman.email;
       }
     }
