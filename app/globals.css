@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy:   #0b1829;
+  --navy2:  #132540;
+  --gold:   #c9a84c;
+  --gold-lt:#e8c97a;
+  --white:  #f5f5f5;
+  --muted:  #8a9ab5;
+  --border: #1e3050;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--navy);
+  color: var(--white);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography ──────────────────────────────── */
+.font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+.font-label   { font-family: 'Montserrat', system-ui, sans-serif; }
+
+/* ── Gold Text Shimmer ───────────────────────── */
+.gold-text {
+  background: linear-gradient(90deg, #c9a84c 0%, #f0d980 50%, #c9a84c 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Scrollbar ───────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #091422; }
+::-webkit-scrollbar-thumb { background: #2a4060; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ── Section divider ─────────────────────────── */
+.section-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #c9a84c, transparent);
+  margin: 16px 0;
+}
+
+/* ── Gold border glow ────────────────────────── */
+.gold-border { border: 1px solid rgba(201, 168, 76, 0.4); }
+.gold-border:hover { border-color: rgba(201, 168, 76, 0.8); }
+
+/* ── Glass card ──────────────────────────────── */
+.glass {
+  background: rgba(11, 24, 41, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Animated underline ──────────────────────── */
+.animated-link {
+  position: relative;
+}
+.animated-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+.animated-link:hover::after { width: 100%; }
+
+/* ── Gallery ─────────────────────────────────── */
+.gallery-thumb {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.gallery-thumb:hover {
+  transform: scale(1.02);
+  opacity: 1;
+}
+
+/* ── Admin form ──────────────────────────────── */
+.admin-input {
+  background: rgba(19, 37, 64, 0.8);
+  border: 1px solid #1e3050;
+  border-radius: 6px;
+  color: #f5f5f5;
+  padding: 10px 14px;
+  width: 100%;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.admin-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.15);
+}
+.admin-input::placeholder { color: #4a6080; }
+.admin-input option { background: #0b1829; }
+
+/* ── Suppress browser autofill icons (Chrome/Edge) ── */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+input[autocomplete="off"]::-webkit-contacts-auto-fill-button { display: none !important; }
+
+/* ── Sticky CTA ──────────────────────────────── */
+@media (max-width: 768px) {
+  .sticky-cta {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+}
