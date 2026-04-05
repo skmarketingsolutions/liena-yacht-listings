@@ -64,7 +64,7 @@ export default function VideoHero({ videoUrl }: VideoHeroProps) {
         </h1>
 
         <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
-          Miami&apos;s luxury yacht sales specialist. I personally curate every listing — flybridge yachts,
+          Miami&apos;s luxury yacht sales specialist. I personally curate every listing including flybridge yachts,
           motor yachts, and superyachts for the most discerning buyers.
         </p>
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, User, Anchor, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Anchor, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -66,18 +66,15 @@ export default function AdminLoginPage() {
               <label className="block font-label text-[10px] tracking-[2px] uppercase text-gray-500 mb-1.5">
                 Username
               </label>
-              <div className="relative">
-                <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
-                <input
-                  type="text"
-                  value={form.username}
-                  onChange={(e) => setForm({ ...form, username: e.target.value })}
-                  placeholder="admin"
-                  required
-                  autoComplete="username"
-                  className="admin-input pl-9"
-                />
-              </div>
+              <input
+                type="text"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                placeholder="admin"
+                required
+                autoComplete="username"
+                className="admin-input"
+              />
             </div>
 
             {/* Password */}
@@ -86,7 +83,6 @@ export default function AdminLoginPage() {
                 Password
               </label>
               <div className="relative">
-                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
                 <input
                   type={showPw ? 'text' : 'password'}
                   value={form.password}
@@ -94,7 +90,7 @@ export default function AdminLoginPage() {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="admin-input pl-9 pr-10"
+                  className="admin-input pr-10"
                 />
                 <button
                   type="button"
