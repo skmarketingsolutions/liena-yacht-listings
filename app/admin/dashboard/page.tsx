@@ -9,7 +9,8 @@ import {
   type Listing,
 } from '@/lib/db';
 import AdminNav from '@/components/AdminNav';
-import { Plus, Edit, Trash2, Eye, Star, Users, LayoutGrid, MessageSquare } from 'lucide-react';
+import DeleteListingButton from '@/components/DeleteListingButton';
+import { Plus, Edit, Eye, Star, Users, LayoutGrid, MessageSquare } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -207,7 +208,7 @@ export default async function DashboardPage() {
                           >
                             <Edit size={15} />
                           </Link>
-                          <DeleteButton listingId={listing.id} title={listing.title} />
+                          <DeleteListingButton listingId={listing.id} title={listing.title} />
                         </div>
                       </td>
                     </tr>
@@ -268,27 +269,5 @@ export default async function DashboardPage() {
         )}
       </main>
     </div>
-  );
-}
-
-function DeleteButton({ listingId, title }: { listingId: number; title: string }) {
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-        const res = await fetch(`/api/listings/${listingId}`, { method: 'DELETE' });
-        if (res.ok) window.location.reload();
-        else alert('Failed to delete listing.');
-      }}
-    >
-      <button
-        type="submit"
-        className="p-1.5 text-gray-500 hover:text-red-400 transition-colors"
-        title="Delete listing"
-      >
-        <Trash2 size={15} />
-      </button>
-    </form>
   );
 }
