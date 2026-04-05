@@ -64,16 +64,21 @@ export interface Lead {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Row = Record<string, any>;
 
+// Cast the neon tagged-template function so every `await sql\`...\`` resolves
+// to `Row[]` — avoids the `FullQueryResults<boolean>` union branch that TS
+// can't call .map() or index [0] on.
+type SqlFn = (strings: TemplateStringsArray, ...values: unknown[]) => Promise<Row[]>;
+
 let _sql: ReturnType<typeof neon> | null = null;
 
-function getDb() {
+function getDb(): SqlFn {
   if (!_sql) {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL environment variable is not set');
     }
     _sql = neon(process.env.DATABASE_URL);
   }
-  return _sql;
+  return _sql as unknown as SqlFn;
 }
 
 // ── Row mappers ───────────────────────────────────────────────────────────────
