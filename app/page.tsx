@@ -16,7 +16,12 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const listings = await getAllListings();
+  let listings: Awaited<ReturnType<typeof getAllListings>> = [];
+  try {
+    listings = await getAllListings();
+  } catch {
+    // DATABASE_URL not configured — render empty state instead of crashing
+  }
 
   const videoUrl = process.env.NEXT_PUBLIC_HERO_VIDEO_URL || '';
 

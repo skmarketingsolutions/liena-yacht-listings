@@ -24,7 +24,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const listing = await getListingBySlug(params.slug);
+  let listing = null;
+  try { listing = await getListingBySlug(params.slug); } catch { /* DB not ready */ }
   if (!listing) return {};
 
   const title = listing.seo_title || `${listing.title} For Sale | Liena Q Perez`;
@@ -57,7 +58,8 @@ function formatPrice(price: number) {
 }
 
 export default async function ListingPage({ params }: PageProps) {
-  const listing = await getListingBySlug(params.slug);
+  let listing = null;
+  try { listing = await getListingBySlug(params.slug); } catch { /* DB not ready */ }
   if (!listing) notFound();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lienayperez.com';
