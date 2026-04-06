@@ -33,11 +33,13 @@ export default function Footer() {
             <h3 className="font-label text-[10px] tracking-[3px] uppercase text-gold-500 mb-5">Navigation</h3>
             <ul className="flex flex-col gap-3">
               {[
-                { label: 'All Listings', href: '/#listings' },
-                { label: 'Featured Yachts', href: '/#listings' },
-                { label: 'About Us', href: '/#about' },
+                { label: 'All Listings', href: '/yachts' },
+                { label: 'Yachts in Miami', href: '/yachts/miami' },
+                { label: 'Yachts in Fort Lauderdale', href: '/yachts/fort-lauderdale' },
+                { label: 'Yachts in South Florida', href: '/yachts/south-florida' },
+                { label: 'Broker Profile', href: '/broker/liena-q-perez' },
+                { label: 'About', href: '/#about' },
                 { label: 'Contact', href: '/#contact' },
-                { label: 'Admin Login', href: '/admin/login' },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link href={href} className="text-gray-400 hover:text-gold-400 text-sm transition-colors animated-link">

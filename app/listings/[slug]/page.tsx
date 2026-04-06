@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR — regenerate hourly, no force-dynamic
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
@@ -65,31 +65,52 @@ export default async function ListingPage({ params }: PageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lienayperez.com';
 
   // JSON-LD structured data
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: listing.title,
-    description: listing.description,
-    image: listing.photos,
-    offers: {
-      '@type': 'Offer',
-      price: listing.price,
-      priceCurrency: 'USD',
-      availability: listing.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
-      seller: {
-        '@type': 'Person',
-        name: 'Liena Q Perez',
-        telephone: '+17868389911',
-        url: siteUrl,
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: listing.title,
+      description: listing.description,
+      image: listing.photos,
+      brand: { '@type': 'Brand', name: listing.make },
+      offers: {
+        '@type': 'Offer',
+        price: listing.price,
+        priceCurrency: 'USD',
+        availability: listing.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
+        seller: {
+          '@type': 'Person',
+          name: 'Liena Q Perez',
+          telephone: '+17868389911',
+          email: 'liena@italiaboats.com',
+          url: siteUrl,
+        },
       },
+      additionalProperty: Object.entries(listing.specs).map(([name, value]) => ({
+        '@type': 'PropertyValue',
+        name,
+        value,
+      })),
     },
-    brand: { '@type': 'Brand', name: listing.make },
-    additionalProperty: Object.entries(listing.specs).map(([name, value]) => ({
-      '@type': 'PropertyValue',
-      name,
-      value,
-    })),
-  };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+        { '@type': 'ListItem', position: 2, name: 'Yachts For Sale', item: `${siteUrl}/yachts` },
+        { '@type': 'ListItem', position: 3, name: listing.title, item: `${siteUrl}/listings/${listing.slug}` },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      name: 'Liena Q Perez — Luxury Yacht Sales',
+      telephone: '+17868389911',
+      email: 'liena@italiaboats.com',
+      url: siteUrl,
+      address: { '@type': 'PostalAddress', addressLocality: 'Miami', addressRegion: 'FL', addressCountry: 'US' },
+    },
+  ];
 
   return (
     <>

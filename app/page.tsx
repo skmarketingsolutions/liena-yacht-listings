@@ -1,11 +1,36 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import VideoHero from '@/components/VideoHero';
 import YachtCard from '@/components/YachtCard';
 import LeadForm from '@/components/LeadForm';
 import { getAllListings } from '@/lib/db';
-import { Phone, Mail, Shield, Award, Users } from 'lucide-react';
+import { SITE_URL, BROKER, LOCATIONS } from '@/lib/seo-config';
+import { Phone, Mail, Shield, Award, Users, MapPin } from 'lucide-react';
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Liena Q Perez — Luxury Yacht Sales',
+  alternateName: 'Italia Boats',
+  description:
+    'Miami luxury yacht sales specialist. Flybridge yachts, motor yachts, and superyachts for sale in Miami, Fort Lauderdale, and South Florida.',
+  url: SITE_URL,
+  telephone: BROKER.phone,
+  email: BROKER.email,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Miami',
+    addressRegion: 'FL',
+    postalCode: '33132',
+    addressCountry: 'US',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 25.7617, longitude: -80.1918 },
+  priceRange: '$$$',
+  areaServed: LOCATIONS.map((l) => l.fullName),
+  sameAs: [],
+};
 
 export const metadata: Metadata = {
   title: 'Luxury Yacht Sales Miami & Miami Beach',
@@ -13,7 +38,7 @@ export const metadata: Metadata = {
     "Liena Q Perez — Miami's luxury yacht sales specialist. Browse exclusive flybridge yachts and motor yachts for sale in Miami & Miami Beach. Contact Liena for a private showing.",
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR — regenerate every hour
 
 export default async function HomePage() {
   let listings: Awaited<ReturnType<typeof getAllListings>> = [];
@@ -28,6 +53,12 @@ export default async function HomePage() {
   return (
     <>
       <Header />
+
+      {/* Org JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <VideoHero videoUrl={videoUrl} />
@@ -57,6 +88,26 @@ export default async function HomePage() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ── Browse by Location ──────────────────────────────── */}
+      <section className="py-12 px-6 lg:px-10 bg-[#081422]">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="font-display text-2xl font-semibold text-white mb-2">Browse by Market</h2>
+          <div className="section-divider mb-6" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {LOCATIONS.slice(0, 10).map((loc) => (
+              <Link
+                key={loc.slug}
+                href={`/yachts/${loc.slug}`}
+                className="flex items-center gap-2 bg-[#0d1e33] border border-[#1e3050] hover:border-gold-500/40 rounded-lg px-4 py-3 text-gray-400 hover:text-gold-400 text-sm transition-colors"
+              >
+                <MapPin size={13} className="text-gold-500/60 shrink-0" />
+                {loc.name}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
