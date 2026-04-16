@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LeadForm from '@/components/LeadForm';
@@ -114,14 +115,13 @@ export default function AboutPage() {
                 <div className="relative">
                   {/* Gold frame accent */}
                   <div className="absolute -inset-[3px] rounded-2xl bg-gradient-to-br from-gold-500/40 via-transparent to-gold-500/20" />
-                  <div className="relative w-[340px] sm:w-[400px] aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.7)]">
-                    <Image
+                  <div className="relative w-[340px] sm:w-[400px] rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.7)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src="/images/liena-headshot.jpeg"
                       alt="Liena Q Perez — Miami Luxury Yacht Broker"
-                      fill
-                      sizes="(max-width: 640px) 340px, 400px"
-                      className="object-cover object-top"
-                      priority
+                      className="w-full h-auto object-cover object-top"
+                      loading="eager"
                     />
                   </div>
                   {/* Floating badge */}
