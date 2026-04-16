@@ -224,8 +224,12 @@ The massive flybridge features three distinct social areas: a forward chaise lon
     }
 
     // ── Always: insert new listings if they don't exist yet ──────────────────
-    const R2 = ''; // new videos served from /videos/ (committed to git)
     const newListingsAdded: string[] = [];
+
+    // Pre-build photo arrays for the 3 new listings
+    const mgPhotosArr = Array.from({ length: 50 }, (_, i) => `/listings/1999-mangusta-80-miami/photo_${String(i + 2).padStart(2, '0')}.jpeg`);
+    const nwPhotosArr = Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-white-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`);
+    const ngPhotosArr = Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-grey-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`);
 
     // ── 1999 Mangusta 80 ─────────────────────────────────────────────────────
     const [{ n: mgCount }] = await sql`SELECT COUNT(*)::int AS n FROM listings WHERE slug = '1999-mangusta-80-miami'`;
@@ -266,7 +270,7 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
           '1999-mangusta-80-miami', '1999 Mangusta 80', ${null},
           1999, 'Mangusta', '80', 80, 699000, 'Miami, Florida',
           ${mgDesc},
-          ${mgSpecs}::jsonb, ${mgFeatures}::jsonb, '[]'::jsonb,
+          ${mgSpecs}::jsonb, ${mgFeatures}::jsonb, ${JSON.stringify(mgPhotosArr)}::jsonb,
           ${'/videos/mangusta-80.mp4'},
           true, 'active', ${null},
           '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
@@ -314,7 +318,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
           '2026-nassima-n40-white-fort-lauderdale', '2026 Nassima Yacht N40 — White', ${null},
           2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida',
           ${nwDesc},
-          ${nwSpecs}::jsonb, ${nwFeatures}::jsonb, '[]'::jsonb,
+          ${nwSpecs}::jsonb, ${nwFeatures}::jsonb, ${JSON.stringify(nwPhotosArr)}::jsonb,
           ${'/videos/nassima-n40-white.mp4'},
           true, 'active', ${null},
           '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
@@ -365,7 +369,7 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
           '2026-nassima-n40-grey-fort-lauderdale', '2026 Nassima Yacht N40 — Grey', ${null},
           2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida',
           ${ngDesc},
-          ${ngSpecs}::jsonb, ${ngFeatures}::jsonb, '[]'::jsonb,
+          ${ngSpecs}::jsonb, ${ngFeatures}::jsonb, ${JSON.stringify(ngPhotosArr)}::jsonb,
           ${'/videos/nassima-n40-grey.mp4'},
           true, 'active', ${null},
           '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',
@@ -404,15 +408,29 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
       WHERE slug = '2026-nassima-n40-grey-fort-lauderdale'
         AND (video_url IS NULL OR video_url NOT LIKE '%nassima-n40-grey%')
     `;
+    const mgPhotos = JSON.stringify(
+      Array.from({ length: 50 }, (_, i) => `/listings/1999-mangusta-80-miami/photo_${String(i + 2).padStart(2, '0')}.jpeg`)
+    );
+    const nwPhotos = JSON.stringify(
+      Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-white-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`)
+    );
+    const ngPhotos = JSON.stringify(
+      Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-grey-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`)
+    );
     await sql`
-      UPDATE listings
-      SET photos = '[]'::jsonb, updated_at = NOW()
-      WHERE slug IN (
-        '1999-mangusta-80-miami',
-        '2026-nassima-n40-white-fort-lauderdale',
-        '2026-nassima-n40-grey-fort-lauderdale'
-      )
-      AND photos != '[]'::jsonb
+      UPDATE listings SET photos = ${mgPhotos}::jsonb, updated_at = NOW()
+      WHERE slug = '1999-mangusta-80-miami'
+        AND (photos = '[]'::jsonb OR jsonb_array_length(photos) = 0)
+    `;
+    await sql`
+      UPDATE listings SET photos = ${nwPhotos}::jsonb, updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-white-fort-lauderdale'
+        AND (photos = '[]'::jsonb OR jsonb_array_length(photos) = 0)
+    `;
+    await sql`
+      UPDATE listings SET photos = ${ngPhotos}::jsonb, updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-grey-fort-lauderdale'
+        AND (photos = '[]'::jsonb OR jsonb_array_length(photos) = 0)
     `;
 
     return NextResponse.json({

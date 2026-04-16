@@ -223,16 +223,35 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
         AND (video_url IS NULL OR video_url NOT LIKE '%nassima-n40-grey%')
     `;
 
-    // Clear any stale photos on the 3 new listings — they use video covers only
+    // Set photos arrays for the 3 new listings (extracted from PDFs)
+    // photo_01 is the 494×158 header banner — real gallery starts at photo_02
+    const mgPhotos = JSON.stringify(
+      Array.from({ length: 50 }, (_, i) => `/listings/1999-mangusta-80-miami/photo_${String(i + 2).padStart(2, '0')}.jpeg`)
+    );
+    const nwPhotos = JSON.stringify(
+      Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-white-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`)
+    );
+    const ngPhotos = JSON.stringify(
+      Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-grey-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`)
+    );
+
     await sql`
       UPDATE listings
-      SET photos = '[]'::jsonb, updated_at = NOW()
-      WHERE slug IN (
-        '1999-mangusta-80-miami',
-        '2026-nassima-n40-white-fort-lauderdale',
-        '2026-nassima-n40-grey-fort-lauderdale'
-      )
-      AND photos != '[]'::jsonb
+      SET photos = ${mgPhotos}::jsonb, updated_at = NOW()
+      WHERE slug = '1999-mangusta-80-miami'
+        AND (photos = '[]'::jsonb OR jsonb_array_length(photos) = 0)
+    `;
+    await sql`
+      UPDATE listings
+      SET photos = ${nwPhotos}::jsonb, updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-white-fort-lauderdale'
+        AND (photos = '[]'::jsonb OR jsonb_array_length(photos) = 0)
+    `;
+    await sql`
+      UPDATE listings
+      SET photos = ${ngPhotos}::jsonb, updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-grey-fort-lauderdale'
+        AND (photos = '[]'::jsonb OR jsonb_array_length(photos) = 0)
     `;
 
     console.log('[instrumentation] Data corrections applied');

@@ -228,7 +228,8 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
       'Deck & Exterior': ['Teak Cockpit', 'Cockpit Cushions', 'Hydraulic Gangway', 'Swimming Ladder', 'Gyroscopic Stabilizer', 'Tender', 'Wind Generator', 'Bimini Top', 'Hard Top'],
       'Additional': ['Garage (tender storage)', 'Underwater Lights', 'Wine Cellar'],
     },
-    [], // no photos — video cover only
+    // photo_01 is a 494×158 header banner — gallery starts at photo_02
+    Array.from({ length: 50 }, (_, i) => `/listings/1999-mangusta-80-miami/photo_${String(i + 2).padStart(2, '0')}.jpeg`),
     '/videos/mangusta-80.mp4',
     '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
     '1999 Mangusta 80 for sale in Miami, FL. 80ft Italian express cruiser, twin MTU 2,000hp surface drives, comprehensive refit Oct 2025. Asking $699,000. Call 786-838-9911.',
@@ -288,7 +289,8 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
       'Anchoring & Docking': ['Anchor in stainless steel', 'Stainless steel chain', 'Anchor rinsing system', 'Anchor winch Lewmar 1,000W', 'Wired windlass control', 'Bow shower', 'Bow thruster Lewmar', 'Lewmar hatch'],
       'Electrical & Mechanical': ['Generator', 'Inverter', 'Shore power inlet', 'Battery charger', 'Electric bilge pump', 'Manual bilge pump', 'Electric head', 'Touch screen controls', 'Launching trailer included'],
     },
-    [], // no photos — video cover only
+    // photo_01 is a 494×158 header banner — gallery starts at photo_02
+    Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-white-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`),
     '/videos/nassima-n40-white.mp4',
     '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
     '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
@@ -350,7 +352,8 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
       'Anchoring & Docking': ['Anchor in stainless steel', 'Stainless steel chain', 'Anchor rinsing system', 'Anchor winch Lewmar 1,000W', 'Wired windlass control', 'Bow shower', 'Bow thruster Lewmar', 'Lewmar hatch'],
       'Electrical & Mechanical': ['Generator', 'Inverter', 'Shore power inlet', 'Battery charger', 'Electric bilge pump', 'Manual bilge pump', 'Electric head', 'Touch screen controls', 'Launching trailer included'],
     },
-    [], // no photos — video cover only
+    // photo_01 is a 494×158 header banner — gallery starts at photo_02
+    Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-grey-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`),
     '/videos/nassima-n40-grey.mp4',
     '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',
     '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
