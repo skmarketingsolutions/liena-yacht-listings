@@ -24,8 +24,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  let listing = null;
-  try { listing = await getListingBySlug(params.slug); } catch { /* DB not ready */ }
+  const listing = await getListingBySlug(params.slug);
   if (!listing) return {};
 
   const title = listing.seo_title || `${listing.title} For Sale | Liena Q Perez`;
@@ -51,15 +50,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export const revalidate = 3600; // ISR — regenerate hourly, no force-dynamic
+export const dynamic = 'force-dynamic'; // always fetch fresh — ensures photos/location are never stale
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
 }
 
 export default async function ListingPage({ params }: PageProps) {
-  let listing = null;
-  try { listing = await getListingBySlug(params.slug); } catch { /* DB not ready */ }
+  // getListingBySlug falls back to static data automatically — never throws
+  const listing = await getListingBySlug(params.slug);
   if (!listing) notFound();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lienayperez.com';

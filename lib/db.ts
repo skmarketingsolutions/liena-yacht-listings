@@ -222,16 +222,29 @@ export async function getFeaturedListings(): Promise<Listing[]> {
 }
 
 export async function getListingBySlug(slug: string): Promise<Listing | null> {
+  const staticMatch = STATIC_LISTINGS.find((l) => l.slug === slug);
   try {
     const sql = getDb();
     const rows = await sql`
       SELECT * FROM listings WHERE slug = ${slug} LIMIT 1
     `;
-    if (rows.length > 0) return rowToListing(rows[0]);
+    if (rows.length > 0) {
+      const listing = rowToListing(rows[0]);
+      // Supplement stale DB fields from the static source of truth:
+      // photos — DB may still have '[]' if instrumentation UPDATE hasn't fired
+      if (listing.photos.length === 0 && staticMatch && staticMatch.photos.length > 0) {
+        listing.photos = staticMatch.photos;
+      }
+      // location — DB may still have 'Miami, Florida' for Fort Lauderdale listings
+      if (staticMatch && staticMatch.location !== listing.location) {
+        listing.location = staticMatch.location;
+      }
+      return listing;
+    }
   } catch {
-    // Fall through to static data
+    // DB unavailable — fall through to static data
   }
-  return STATIC_LISTINGS.find((l) => l.slug === slug) ?? null;
+  return staticMatch ?? null;
 }
 
 export async function getListingById(id: number): Promise<Listing | null> {
