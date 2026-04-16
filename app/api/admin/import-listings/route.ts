@@ -121,8 +121,8 @@ Well-maintained and ready to cruise — this Mangusta 80 has been meticulously s
     model: 'N40',
     length_ft: 40,
     price: 799000,
-    location: 'Fort Lauderdale, Florida',
-    description: `The 2026 Nassima Yacht N40 is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available in white from stock in Fort Lauderdale.
+    location: 'Miami, Florida',
+    description: `The 2026 Nassima Yacht N40 is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available in white from stock in Miami.
 
 At 40 feet, this top-of-the-line cruiser is designed to provide the ultimate in comfort and style, with a range of features that truly set it apart. Powered by twin 2023 Mercury Verado V10 outboards producing 400 hp each, the N40 delivers a top speed of 45 knots and a cruising speed of 30 knots — while keeping the motors sleekly hidden beneath the aft sun bed.
 
@@ -130,7 +130,7 @@ Exceptional Design: Every aspect of the N40 has been thoughtfully designed. The 
 
 Performance: With twin 400 hp outboards, the N40 reaches 45 knots maximum and handles open-water conditions with ease on its deep-V hull. A range of 130 nautical miles and a 200-gallon combined fuel capacity make her capable of extended day trips and coastal cruising.
 
-Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound system with 4 exterior speakers, 2 interior speakers, subwoofer and amplifier, teak cockpit and sidedecks, bow thruster, anchor winch — every detail considered. Available in our Miami/Fort Lauderdale stock for immediate delivery.`,
+Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound system with 4 exterior speakers, 2 interior speakers, subwoofer and amplifier, teak cockpit and sidedecks, bow thruster, anchor winch — every detail considered. Available in Miami for immediate delivery.`,
     specs: {
       'LOA': '39 ft 7 in',
       'Beam': '12 ft 6 in',
@@ -224,11 +224,11 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     video_url: '/videos/nassima-n40-white.mp4',
     featured: true,
     status: 'active' as const,
-    seo_title: '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
+    seo_title: '2026 Nassima Yacht N40 White For Sale Miami | $799,000',
     seo_description:
-      '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
+      '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
     seo_keywords:
-      '2026 Nassima N40 for sale, Nassima Yacht N40 white, luxury cruiser Fort Lauderdale, new yacht Florida, Italian boat for sale Miami',
+      '2026 Nassima N40 for sale, Nassima Yacht N40 white, luxury cruiser Miami, new yacht Florida, Italian boat for sale Miami',
   },
   {
     slug: '2026-nassima-n40-grey-fort-lauderdale',
@@ -239,8 +239,8 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     model: 'N40',
     length_ft: 40,
     price: 799000,
-    location: 'Fort Lauderdale, Florida',
-    description: `The 2026 Nassima Yacht N40 in grey is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available from stock in Fort Lauderdale.
+    location: 'Miami, Florida',
+    description: `The 2026 Nassima Yacht N40 in grey is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available from stock in Miami.
 
 At 40 feet, this top-of-the-line cruiser is designed to provide the ultimate in comfort and style. Powered by twin 2023 Mercury Verado V10 outboards producing 400 hp each, the N40 delivers a top speed of 45 knots and a cruising speed of 30 knots — all while keeping the motors sleekly hidden beneath the aft sun bed for a clean, uninterrupted silhouette.
 
@@ -248,7 +248,7 @@ The grey colorway gives this N40 a bold, contemporary look that stands apart fro
 
 Exceptional Design: The spacious cabin offers memory foam mattresses, 22" TV, dual fridge, electric stove, and a full head with shower — perfect for overnight stays. The automatic handling sofas expand the cockpit configuration, and the automatic aft sun bed opens seamlessly to access the engines.
 
-Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound system with 4 exterior speakers, 2 interior speakers, subwoofer and amplifier, teak cockpit and sidedecks, bow thruster, anchor winch — every detail considered. Available in Fort Lauderdale stock for immediate delivery.`,
+Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound system with 4 exterior speakers, 2 interior speakers, subwoofer and amplifier, teak cockpit and sidedecks, bow thruster, anchor winch — every detail considered. Available in Miami for immediate delivery.`,
     specs: {
       'LOA': '39 ft 7 in',
       'Beam': '12 ft 6 in',
@@ -343,11 +343,11 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     video_url: '/videos/nassima-n40-grey.mp4',
     featured: true,
     status: 'active' as const,
-    seo_title: '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',
+    seo_title: '2026 Nassima Yacht N40 Grey For Sale Miami | $799,000',
     seo_description:
-      '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
+      '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
     seo_keywords:
-      '2026 Nassima N40 grey for sale, Nassima Yacht N40, luxury cruiser Fort Lauderdale, new yacht Florida, Italian boat for sale Miami',
+      '2026 Nassima N40 grey for sale, Nassima Yacht N40, luxury cruiser Miami, new yacht Florida, Italian boat for sale Miami',
   },
 ];
 

@@ -235,7 +235,7 @@ export async function getListingBySlug(slug: string): Promise<Listing | null> {
       if (listing.photos.length === 0 && staticMatch && staticMatch.photos.length > 0) {
         listing.photos = staticMatch.photos;
       }
-      // location — DB may still have 'Miami, Florida' for Fort Lauderdale listings
+      // location — always enforce static value (Miami, Florida) over whatever DB has
       if (staticMatch && staticMatch.location !== listing.location) {
         listing.location = staticMatch.location;
       }

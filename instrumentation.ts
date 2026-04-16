@@ -95,13 +95,13 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
     // ── 2026 Nassima N40 White ────────────────────────────────────────────────
     const nwCheck = await sql`SELECT id FROM listings WHERE slug = '2026-nassima-n40-white-fort-lauderdale' LIMIT 1` as Row[];
     if (nwCheck.length === 0) {
-      const nwDesc = `The 2026 Nassima Yacht N40 is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available in white from stock in Fort Lauderdale.
+      const nwDesc = `The 2026 Nassima Yacht N40 is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available in white from stock in Miami.
 
 At 40 feet, this top-of-the-line cruiser is designed to provide the ultimate in comfort and style. Powered by twin 2023 Mercury Verado V10 outboards producing 400 hp each, the N40 delivers a top speed of 45 knots and a cruising speed of 30 knots — while keeping the motors sleekly hidden beneath the aft sun bed.
 
 Exceptional Design: The spacious cabin features memory foam mattresses, 22" TV, dual fridge, electric stove, and full head with shower — perfect for overnight stays. The automatic handling sofas expand the cockpit configuration, and the automatic aft sun bed opens to access the engines seamlessly.
 
-Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound system with 4 exterior speakers, 2 interior speakers, subwoofer and amplifier, teak cockpit and sidedecks, bow thruster, anchor winch. Available in Fort Lauderdale stock for immediate delivery.`;
+Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound system with 4 exterior speakers, 2 interior speakers, subwoofer and amplifier, teak cockpit and sidedecks, bow thruster, anchor winch. Available in Miami for immediate delivery.`;
 
       const nassFeatures = JSON.stringify({
         'Navigation & Helm': ['Double Garmin 12" touchscreens', 'Garmin EmpireBUS home automation', 'Secondary navigation GPS', 'Compass', 'VHF Radio', 'Radar', 'Depthsounder', '4 USB outlets', 'Ergonomic driving seats'],
@@ -127,13 +127,13 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
           salesman_id, seo_title, seo_description, seo_keywords)
         VALUES (
           '2026-nassima-n40-white-fort-lauderdale', '2026 Nassima Yacht N40 — White', ${null},
-          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida', ${nwDesc},
+          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Miami, Florida', ${nwDesc},
           ${nassSpecs}::jsonb, ${nassFeatures}::jsonb, '[]'::jsonb,
           '/videos/nassima-n40-white.mp4',
           true, 'active', ${null},
-          '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
-          '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
-          '2026 Nassima N40 for sale,Nassima Yacht N40 white,luxury cruiser Fort Lauderdale,new yacht Florida,Italian boat for sale Miami'
+          '2026 Nassima Yacht N40 White For Sale Miami | $799,000',
+          '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
+          '2026 Nassima N40 for sale,Nassima Yacht N40 white,luxury cruiser Miami,new yacht Florida,Italian boat for sale Miami'
         )
       `;
       console.log('[instrumentation] Inserted: 2026 Nassima N40 White');
@@ -142,7 +142,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     // ── 2026 Nassima N40 Grey ─────────────────────────────────────────────────
     const ngCheck = await sql`SELECT id FROM listings WHERE slug = '2026-nassima-n40-grey-fort-lauderdale' LIMIT 1` as Row[];
     if (ngCheck.length === 0) {
-      const ngDesc = `The 2026 Nassima Yacht N40 in grey is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available from stock in Fort Lauderdale.
+      const ngDesc = `The 2026 Nassima Yacht N40 in grey is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available from stock in Miami.
 
 At 40 feet, this top-of-the-line cruiser delivers the ultimate in comfort and style. Powered by twin 2023 Mercury Verado V10 outboards producing 400 hp each, the N40 hits a top speed of 45 knots and a cruising speed of 30 knots — while keeping the motors hidden beneath the aft sun bed for a clean, uninterrupted silhouette.
 
@@ -150,7 +150,7 @@ The grey colorway gives this N40 a bold, contemporary look that stands apart. Ev
 
 The spacious cabin features memory foam mattresses, 22" TV, dual fridge, electric stove, and a full head with shower. The automatic handling sofas expand the cockpit, and the automatic aft sun bed opens seamlessly to access the engines.
 
-Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and sidedecks, bow thruster, anchor winch. Available in Fort Lauderdale stock for immediate delivery.`;
+Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and sidedecks, bow thruster, anchor winch. Available in Miami for immediate delivery.`;
 
       const ngSpecs = JSON.stringify({
         'LOA': '39 ft 7 in', 'Beam': '12 ft 6 in', 'Dry Weight': '17,000 lb',
@@ -177,13 +177,13 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
           salesman_id, seo_title, seo_description, seo_keywords)
         VALUES (
           '2026-nassima-n40-grey-fort-lauderdale', '2026 Nassima Yacht N40 — Grey', ${null},
-          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida', ${ngDesc},
+          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Miami, Florida', ${ngDesc},
           ${ngSpecs}::jsonb, ${ngFeatures}::jsonb, '[]'::jsonb,
           '/videos/nassima-n40-grey.mp4',
           true, 'active', ${null},
-          '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',
-          '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
-          '2026 Nassima N40 grey for sale,Nassima Yacht N40,luxury cruiser Fort Lauderdale,new yacht Florida,Italian boat for sale Miami'
+          '2026 Nassima Yacht N40 Grey For Sale Miami | $799,000',
+          '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
+          '2026 Nassima N40 grey for sale,Nassima Yacht N40,luxury cruiser Miami,new yacht Florida,Italian boat for sale Miami'
         )
       `;
       console.log('[instrumentation] Inserted: 2026 Nassima N40 Grey');
