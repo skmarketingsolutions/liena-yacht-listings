@@ -224,11 +224,11 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     video_url: '/videos/nassima-n40-white.mp4',
     featured: true,
     status: 'active' as const,
-    seo_title: '2026 Nassima Yacht N40 White For Sale Miami | $799,000',
+    seo_title: '2026 Nassima N40 White — New Cruiser Miami | $799K',
     seo_description:
-      '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
+      'New 2026 Nassima N40 White for sale in Miami. 40ft Italian cruiser, twin Mercury Verado 400hp, 45 knots. $799,000. Contact Liena Q Perez.',
     seo_keywords:
-      '2026 Nassima N40 for sale, Nassima Yacht N40 white, luxury cruiser Miami, new yacht Florida, Italian boat for sale Miami',
+      '2026 Nassima N40 for sale,Nassima N40 White Miami,new boat for sale Miami Florida,new Italian cruiser Miami,40ft cruiser Miami,yacht for sale Miami',
   },
   {
     slug: '2026-nassima-n40-grey-fort-lauderdale',
@@ -343,11 +343,11 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     video_url: '/videos/nassima-n40-grey.mp4',
     featured: true,
     status: 'active' as const,
-    seo_title: '2026 Nassima Yacht N40 Grey For Sale Miami | $799,000',
+    seo_title: '2026 Nassima N40 Grey — New Cruiser Miami | $799K',
     seo_description:
-      '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
+      'New 2026 Nassima N40 Grey for sale in Miami. 40ft Italian cruiser, twin Mercury Verado 400hp, 45 knots. $799,000. Contact Liena Q Perez.',
     seo_keywords:
-      '2026 Nassima N40 grey for sale, Nassima Yacht N40, luxury cruiser Miami, new yacht Florida, Italian boat for sale Miami',
+      '2026 Nassima N40 grey for sale,Nassima N40 Grey Miami,new boat for sale Miami Florida,new Italian cruiser Miami,40ft cruiser Miami,yacht for sale Miami',
   },
 ];
 

@@ -84,9 +84,9 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
           '[]'::jsonb,
           '/videos/mangusta-80.mp4',
           true, 'active', ${null},
-          '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
-          '1999 Mangusta 80 for sale in Miami, FL. 80ft Italian express cruiser, twin MTU 2,000hp surface drives, comprehensive refit Oct 2025. Asking $699,000. Call 786-838-9911.',
-          '1999 Mangusta 80 for sale,Mangusta 80 Miami,express cruiser Miami,Italian yacht Miami,used yacht for sale Florida'
+          '1999 Mangusta 80 Express Cruiser Miami | $699K',
+          '1999 Mangusta 80 for sale in Miami. 80ft Italian express cruiser, twin MTU 2,000hp, surface drives, full refit Oct 2025. $699,000. Call Liena.',
+          'Mangusta 80 for sale,Mangusta 80 Miami,express cruiser Miami Florida,Italian express cruiser for sale,80ft yacht Miami,used yacht for sale Miami'
         )
       `;
       console.log('[instrumentation] Inserted: 1999 Mangusta 80');
@@ -131,9 +131,9 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
           ${nassSpecs}::jsonb, ${nassFeatures}::jsonb, '[]'::jsonb,
           '/videos/nassima-n40-white.mp4',
           true, 'active', ${null},
-          '2026 Nassima Yacht N40 White For Sale Miami | $799,000',
-          '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
-          '2026 Nassima N40 for sale,Nassima Yacht N40 white,luxury cruiser Miami,new yacht Florida,Italian boat for sale Miami'
+          '2026 Nassima N40 White — New Cruiser Miami | $799K',
+          'New 2026 Nassima N40 White for sale in Miami. 40ft Italian cruiser, twin Mercury Verado 400hp, 45 knots. $799,000. Contact Liena Q Perez.',
+          '2026 Nassima N40 for sale,Nassima N40 White Miami,new boat for sale Miami Florida,new Italian cruiser Miami,40ft cruiser Miami,yacht for sale Miami'
         )
       `;
       console.log('[instrumentation] Inserted: 2026 Nassima N40 White');
@@ -181,9 +181,9 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
           ${ngSpecs}::jsonb, ${ngFeatures}::jsonb, '[]'::jsonb,
           '/videos/nassima-n40-grey.mp4',
           true, 'active', ${null},
-          '2026 Nassima Yacht N40 Grey For Sale Miami | $799,000',
-          '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
-          '2026 Nassima N40 grey for sale,Nassima Yacht N40,luxury cruiser Miami,new yacht Florida,Italian boat for sale Miami'
+          '2026 Nassima N40 Grey — New Cruiser Miami | $799K',
+          'New 2026 Nassima N40 Grey for sale in Miami. 40ft Italian cruiser, twin Mercury Verado 400hp, 45 knots. $799,000. Contact Liena Q Perez.',
+          '2026 Nassima N40 grey for sale,Nassima N40 Grey Miami,new boat for sale Miami Florida,new Italian cruiser Miami,40ft cruiser Miami,yacht for sale Miami'
         )
       `;
       console.log('[instrumentation] Inserted: 2026 Nassima N40 Grey');

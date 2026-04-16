@@ -112,9 +112,9 @@ Three beautifully appointed staterooms accommodate up to 6 guests, while the ful
       '/listings/azimut-fly-50/photo_08.jpeg',
     ],
     `${R2}/sfx%20.mp4`,
-    '2019 Azimut Fly 50 Flybridge For Sale in Miami | Liena Q Perez',
-    'Pristine 2019 Azimut Fly 50 "La Paloma" for sale in Miami, FL. 50ft flybridge yacht with twin Volvo Penta diesels, SeaKeeper stabilizer, 3 staterooms & flybridge bar. $980,000. Contact Liena Q Perez.',
-    '2019 Azimut Fly 50 for sale,Azimut 50 flybridge Miami,used Azimut yacht Florida,flybridge yacht Miami,50 foot yacht for sale,luxury yacht Miami',
+    '2019 Azimut Fly 50 Flybridge — Miami | $980K',
+    '2019 Azimut Fly 50 flybridge for sale in Miami, FL. 50ft, twin Volvo Penta diesels, SeaKeeper, 3 staterooms & flybridge bar. $980,000. Call Liena.',
+    '2019 Azimut Fly 50 for sale,flybridge yacht Miami,Azimut flybridge Miami,used Azimut yacht Florida,50ft yacht Miami,luxury yacht for sale Miami',
   ),
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -169,9 +169,9 @@ The massive flybridge features three distinct social areas: a forward chaise lon
       '/listings/fairline-squadron-65/photo_09.jpeg',
     ],
     `${R2}/Final%20Fairline.mp4`,
-    '2013 Fairline Squadron 65 Motor Yacht For Sale Miami Beach | Liena Q Perez',
-    '2013 Fairline Squadron 65 for sale in Miami Beach, FL. 66ft motor yacht with twin CAT 1,150hp engines (690 hrs), Seakeeper, bow & stern thrusters, garage & WaveRunner. $1,300,000. Contact Liena Q Perez.',
-    '2013 Fairline Squadron 65 for sale,Fairline Squadron 65 Miami Beach,used motor yacht Florida,66 foot yacht for sale,Fairline yacht Miami,luxury motor yacht Miami Beach',
+    '2013 Fairline Squadron 65 Motor Yacht — Miami',
+    '2013 Fairline Squadron 65 for sale in Miami. 66ft motor yacht, twin CAT 1,150hp, Seakeeper, garage & jet ski. $1,300,000. Call Liena Q Perez.',
+    '2013 Fairline Squadron 65 for sale,motor yacht Miami Florida,Fairline Squadron 65 Miami,used motor yacht Miami,66ft motor yacht for sale,luxury motor yacht Miami',
   ),
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -231,9 +231,9 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
     // photo_01 is a 494×158 header banner — gallery starts at photo_02
     Array.from({ length: 50 }, (_, i) => `/listings/1999-mangusta-80-miami/photo_${String(i + 2).padStart(2, '0')}.jpeg`),
     '/videos/mangusta-80.mp4',
-    '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
-    '1999 Mangusta 80 for sale in Miami, FL. 80ft Italian express cruiser, twin MTU 2,000hp surface drives, comprehensive refit Oct 2025. Asking $699,000. Call 786-838-9911.',
-    '1999 Mangusta 80 for sale,Mangusta 80 Miami,express cruiser Miami,Italian yacht Miami,used yacht for sale Florida',
+    '1999 Mangusta 80 Express Cruiser Miami | $699K',
+    '1999 Mangusta 80 for sale in Miami. 80ft Italian express cruiser, twin MTU 2,000hp, surface drives, full refit Oct 2025. $699,000. Call Liena.',
+    'Mangusta 80 for sale,Mangusta 80 Miami,express cruiser Miami Florida,Italian express cruiser for sale,80ft yacht Miami,used yacht for sale Miami',
   ),
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -292,9 +292,9 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     // photo_01 is a 494×158 header banner — gallery starts at photo_02
     Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-white-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`),
     '/videos/nassima-n40-white.mp4',
-    '2026 Nassima Yacht N40 White For Sale Miami | $799,000',
-    '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
-    '2026 Nassima N40 for sale,Nassima Yacht N40 white,luxury cruiser Miami,new yacht Florida,Italian boat for sale Miami',
+    '2026 Nassima N40 White — New Cruiser Miami | $799K',
+    'New 2026 Nassima N40 White for sale in Miami. 40ft Italian cruiser, twin Mercury Verado 400hp, 45 knots. $799,000. Contact Liena Q Perez.',
+    '2026 Nassima N40 for sale,Nassima N40 White Miami,new boat for sale Miami Florida,new Italian cruiser Miami,40ft cruiser Miami,yacht for sale Miami',
   ),
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -355,8 +355,8 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
     // photo_01 is a 494×158 header banner — gallery starts at photo_02
     Array.from({ length: 23 }, (_, i) => `/listings/2026-nassima-n40-grey-fort-lauderdale/photo_${String(i + 2).padStart(2, '0')}.jpeg`),
     '/videos/nassima-n40-grey.mp4',
-    '2026 Nassima Yacht N40 Grey For Sale Miami | $799,000',
-    '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Miami. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
-    '2026 Nassima N40 grey for sale,Nassima Yacht N40,luxury cruiser Miami,new yacht Florida,Italian boat for sale Miami',
+    '2026 Nassima N40 Grey — New Cruiser Miami | $799K',
+    'New 2026 Nassima N40 Grey for sale in Miami. 40ft Italian cruiser, twin Mercury Verado 400hp, 45 knots. $799,000. Contact Liena Q Perez.',
+    '2026 Nassima N40 grey for sale,Nassima N40 Grey Miami,new boat for sale Miami Florida,new Italian cruiser Miami,40ft cruiser Miami,yacht for sale Miami',
   ),
 ];

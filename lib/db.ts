@@ -239,6 +239,12 @@ export async function getListingBySlug(slug: string): Promise<Listing | null> {
       if (staticMatch && staticMatch.location !== listing.location) {
         listing.location = staticMatch.location;
       }
+      // SEO fields — static is the authoritative source; propagate when DB is stale
+      if (staticMatch) {
+        if (staticMatch.seo_title) listing.seo_title = staticMatch.seo_title;
+        if (staticMatch.seo_description) listing.seo_description = staticMatch.seo_description;
+        if (staticMatch.seo_keywords) listing.seo_keywords = staticMatch.seo_keywords;
+      }
       return listing;
     }
   } catch {
