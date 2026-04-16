@@ -207,7 +207,7 @@ The massive flybridge features three distinct social areas: a forward chaise lon
           salesman_id, seo_title, seo_description, seo_keywords, created_at, updated_at)
         VALUES (
           2, '2013-fairline-squadron-65-miami-beach', '2013 Fairline Squadron 65', NULL,
-          2013, 'Fairline', 'Squadron 65', 66, 1300000, 'Miami Beach, Florida',
+          2013, 'Fairline', 'Squadron 65', 66, 1300000, 'Miami, Florida',
           ${flDesc},
           ${flSpecs}::jsonb, ${flFeatures}::jsonb, ${flPhotos}::jsonb,
           'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev/Final%20Fairline.mp4',
@@ -316,7 +316,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
           salesman_id, seo_title, seo_description, seo_keywords)
         VALUES (
           '2026-nassima-n40-white-fort-lauderdale', '2026 Nassima Yacht N40 — White', ${null},
-          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida',
+          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Miami, Florida',
           ${nwDesc},
           ${nwSpecs}::jsonb, ${nwFeatures}::jsonb, ${JSON.stringify(nwPhotosArr)}::jsonb,
           ${'/videos/nassima-n40-white.mp4'},
@@ -367,7 +367,7 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
           salesman_id, seo_title, seo_description, seo_keywords)
         VALUES (
           '2026-nassima-n40-grey-fort-lauderdale', '2026 Nassima Yacht N40 — Grey', ${null},
-          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida',
+          2026, 'Nassima Yacht', 'N40', 40, 799000, 'Miami, Florida',
           ${ngDesc},
           ${ngSpecs}::jsonb, ${ngFeatures}::jsonb, ${JSON.stringify(ngPhotosArr)}::jsonb,
           ${'/videos/nassima-n40-grey.mp4'},
@@ -381,14 +381,11 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
     }
 
     // ── Data corrections: fix stale location / video_url ────────────────────
+    // All listings: location is Miami, Florida
     await sql`
       UPDATE listings
-      SET location = 'Fort Lauderdale, Florida', updated_at = NOW()
-      WHERE slug IN (
-        '2026-nassima-n40-white-fort-lauderdale',
-        '2026-nassima-n40-grey-fort-lauderdale'
-      )
-      AND location != 'Fort Lauderdale, Florida'
+      SET location = 'Miami, Florida', updated_at = NOW()
+      WHERE location != 'Miami, Florida'
     `;
     await sql`
       UPDATE listings

@@ -192,15 +192,11 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
     // ── Data corrections: fix any wrong location / video_url in DB ────────────
     // Runs on every startup — safe because queries are idempotent (WHERE guards).
 
-    // Nassimas: must show Fort Lauderdale, not Miami
+    // All listings: location is Miami, Florida regardless of PDF origin
     await sql`
       UPDATE listings
-      SET location = 'Fort Lauderdale, Florida', updated_at = NOW()
-      WHERE slug IN (
-        '2026-nassima-n40-white-fort-lauderdale',
-        '2026-nassima-n40-grey-fort-lauderdale'
-      )
-      AND location != 'Fort Lauderdale, Florida'
+      SET location = 'Miami, Florida', updated_at = NOW()
+      WHERE location != 'Miami, Florida'
     `;
 
     // Ensure correct video URLs for the 3 new listings

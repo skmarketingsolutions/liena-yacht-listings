@@ -132,7 +132,7 @@ Three beautifully appointed staterooms accommodate up to 6 guests, while the ful
     'Squadron 65',
     66,
     1_300_000,
-    'Miami Beach, Florida',
+    'Miami, Florida',
     `An extraordinary opportunity to own the iconic 2013 Fairline Squadron 65 — a masterpiece of British yacht-building now available in Miami Beach. Bring all offers on this magnificent 66-foot motor yacht that redefines luxury afloat.
 
 Sumptuous furnishings and hand-worked cabinetry are hallmarks of the Squadron range. Nowhere is it more elegantly expressed than in the long, wide single-level interior — a testament to the 65's ingenious flat floor design that is normally reserved for much larger yachts.
@@ -251,7 +251,7 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
     'N40',
     40,
     799_000,
-    'Fort Lauderdale, Florida',
+    'Miami, Florida',
     `The 2026 Nassima Yacht N40 is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available in white from stock in Fort Lauderdale.
 
 At 40 feet, this top-of-the-line cruiser is designed to provide the ultimate in comfort and style. Powered by twin 2023 Mercury Verado V10 outboards producing 400 hp each, the N40 delivers a top speed of 45 knots and a cruising speed of 30 knots — while keeping the motors sleekly hidden beneath the aft sun bed.
@@ -312,7 +312,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
     'N40',
     40,
     799_000,
-    'Fort Lauderdale, Florida',
+    'Miami, Florida',
     `The 2026 Nassima Yacht N40 in grey is a stunning example of Italian craftsmanship and modern luxury — a brand-new vessel available from stock in Fort Lauderdale.
 
 At 40 feet, this top-of-the-line cruiser delivers the ultimate in comfort and style. Powered by twin 2023 Mercury Verado V10 outboards producing 400 hp each, the N40 hits a top speed of 45 knots and a cruising speed of 30 knots — while keeping the motors hidden beneath the aft sun bed for a clean, uninterrupted silhouette.
