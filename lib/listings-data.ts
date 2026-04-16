@@ -1,18 +1,26 @@
 /**
  * Static fallback listing data.
- * These listings are ALWAYS shown — even when the database is unavailable or empty.
- * When Neon Postgres is configured and populated, the DB takes precedence.
- * Adding a new listing here is sufficient to make it appear on the site.
+ *
+ * These are the 5 curated listings. getAllListings() merges this data with the
+ * Neon database: DB rows take priority for matching slugs (they carry real
+ * photos, updated prices, etc.), but every slug here is guaranteed to appear
+ * even when the DB seed is incomplete or the database is unreachable.
+ *
+ * IMPORTANT: slugs must match the DB exactly (see seed route / instrumentation).
  */
 
 import type { Listing } from './db';
 
 const now = new Date().toISOString();
 
+// R2 CDN base — where the large original videos are stored
+const R2 = 'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev';
+
 function stub(
   id: number,
   slug: string,
   title: string,
+  vesselName: string | null,
   year: number,
   make: string,
   model: string,
@@ -22,7 +30,8 @@ function stub(
   description: string,
   specs: Record<string, string>,
   features: Record<string, string[]>,
-  video_url: string,
+  photos: string[],
+  video_url: string | null,
   seo_title: string,
   seo_description: string,
   seo_keywords: string,
@@ -31,7 +40,7 @@ function stub(
     id,
     slug,
     title,
-    vessel_name: null,
+    vessel_name: vesselName,
     year,
     make,
     model,
@@ -41,7 +50,7 @@ function stub(
     description,
     specs,
     features,
-    photos: [],
+    photos,
     video_url,
     featured: true,
     status: 'active',
@@ -55,120 +64,126 @@ function stub(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 1. 2022 Azimut Fly 50
+// 1. 2019 Azimut Fly 50 "La Paloma"
+//    Slug matches DB exactly: 2019-azimut-fly-50-miami
+//    Video: R2 CDN (fast)
 // ─────────────────────────────────────────────────────────────────────────────
-const azimutDesc = `Stunning 2022 Azimut Fly 50 — one of the most sought-after flybridge motor yachts on the market today. This flybridge beauty combines Italian design with exceptional performance and comfortable cruising range.
-
-Immaculately maintained and showing like new, this Azimut 50 Fly is ready for immediate delivery in Miami, Florida. Every detail has been carefully attended to by her professional crew and current owner.
-
-Spacious Flybridge: The expansive flybridge offers panoramic 360-degree views, a large sunpad, dining area, and full helm station — perfect for entertaining while underway or at anchor.
-
-Elegant Interiors: The main salon features full-beam width with floor-to-ceiling windows, premium leather seating, and a fully-equipped galley. Three luxurious staterooms accommodate up to 6 guests with 2 crew quarters.
-
-Performance & Range: Twin Volvo IPS drives provide exceptional fuel economy and outstanding handling, with a cruising speed of 27 knots and comfortable range for extended coastal passages.`;
-
 export const STATIC_LISTINGS: Listing[] = [
   stub(
     1,
-    '2022-azimut-fly-50-miami',
-    '2022 Azimut Fly 50',
-    2022,
+    '2019-azimut-fly-50-miami',
+    '2019 Azimut Fly 50 — La Paloma',
+    'La Paloma',
+    2019,
     'Azimut',
     'Fly 50',
     50,
-    1_195_000,
+    980_000,
     'Miami, Florida',
-    azimutDesc,
+    `Introducing the stunning 2019 Azimut Fly 50 "La Paloma" — a remarkable flybridge yacht that embodies Italian elegance and performance. With an overall length of 50 feet, this vessel is crafted from durable fiberglass and powered by twin Volvo Penta inboard diesel engines, promising a reliable and exhilarating cruising experience.
+
+The Fly 50 is designed for comfort and style, featuring a spacious layout that enhances your time spent at sea. The flybridge offers an ideal vantage point for enjoying breathtaking views while relaxing with friends and family. Equipped with a SeaKeeper gyroscopic stabilizer, Raymarine electronics suite, and JoyStick docking control, this yacht handles like a dream in Miami's waters.
+
+Three beautifully appointed staterooms accommodate up to 6 guests, while the fully-equipped galley with Miele appliances ensures gourmet meals at anchor. The expansive flybridge with wet bar, grill, and U-shaped seating makes this the ultimate Miami entertainment vessel.`,
     {
-      'LOA': '50 ft',
-      'Beam': '14 ft 9 in',
-      'Draft': '3 ft 11 in',
+      'Length Overall': '50 ft',
+      'Beam': '15 ft 3 in',
+      'Max Draft': '4 ft 11 in',
       'Hull Material': 'Fiberglass',
+      'Hull Class': 'Flybridge',
+      'Year': '2019',
       'Fuel Type': 'Diesel',
-      'Engine 1': 'Volvo IPS 600 — 435 hp',
-      'Engine 2': 'Volvo IPS 600 — 435 hp',
-      'Top Speed': '32 kn',
-      'Cruising Speed': '27 kn',
-      'Fuel Capacity': '475 gal',
-      'Water Capacity': '132 gal',
-      'Guest Cabins': '3',
-      'Crew Cabins': '1',
-      'Guest Heads': '3',
-      'Class': 'Flybridge Motor Yacht',
-      'Condition': 'Used — Excellent',
+      'Engine 1': 'Volvo Penta Inboard Diesel',
+      'Engine 2': 'Volvo Penta Inboard Diesel',
+      'Stabilizer': 'SeaKeeper Gyro',
+      'Condition': 'Used',
     },
     {
-      'Electronics': ['Garmin chartplotter', 'Autopilot', 'Radar', 'VHF Radio', 'AIS', 'Depthsounder'],
-      'Interior': ['Air Conditioning throughout', 'Heating', 'Generator', 'Hot Water', 'Fresh Water Maker', 'Refrigerator', 'Dishwasher', 'Microwave', 'Oven', 'Electric Bilge Pump'],
-      'Deck & Exterior': ['Teak Cockpit', 'Bow Thruster', 'Stern Thruster', 'Hydraulic Swim Platform', 'Cockpit Cushions', 'Bimini Top', 'Hard Top'],
-      'Entertainment': ['Flat Screen TVs', 'Cockpit Speakers', 'Wi-Fi', 'Satellite TV'],
+      'Salon': ['Wood flooring throughout', 'Port & starboard salon sofas', 'Hi-Low table on starboard side', 'Bose sound system', 'Sony 4K 3D BluRay', 'Dometic A/C electronic display', 'Large panoramic windows'],
+      'Galley': ['Galley located aft salon port side', 'Large countertop with wood flooring', 'Vitrifrigo undercounter refrigerator', 'Miele Microwave/Oven', 'Miele Induction cooktop', 'Stainless steel sink'],
+      'Electronics': ['(2) Twin Raymarine MFD displays', 'Raymarine Autopilot', 'JoyStick docking control', 'Raymarine VHF Radio', 'SeaKeeper display', 'Sea-Fire shutdown system', 'Raymarine Radar', 'Volvo Penta engine display'],
+      'Deck & Exterior': ['Hydraulic swim platform', 'Teak deck', 'U-Shape aft deck seating', 'Cockpit table with SS pedestal', 'Isotherm cockpit refrigerator', 'JL Audio speakers', 'Fusion MS-NRX300 stereo', 'Fresh water wash down'],
+      'Flybridge': ['Large flybridge — ideal for entertaining', '(2) Sofas on aft flybridge deck', 'U-Shape forward sofa with wood table', 'Wet bar with grill, sink & Vitrifrigo fridge', 'Sunroof', 'JL Audio speakers', '(2) Raymarine MFD displays', 'JoyStick control'],
     },
-    '/videos/azimut-fly-50.mp4',
-    '2022 Azimut Fly 50 For Sale Miami | $1,195,000 | Liena Q Perez',
-    '2022 Azimut Fly 50 for sale in Miami, FL. 50ft Italian flybridge motor yacht, twin Volvo IPS 600, 3 staterooms. Asking $1,195,000. Call Liena Q Perez — 786-838-9911.',
-    '2022 Azimut Fly 50 for sale,Azimut 50 Fly Miami,flybridge yacht Miami,Italian yacht for sale Florida,luxury motor yacht Miami',
+    [
+      '/listings/azimut-fly-50/photo_01.jpeg',
+      '/listings/azimut-fly-50/photo_06.jpeg',
+      '/listings/azimut-fly-50/photo_07.jpeg',
+      '/listings/azimut-fly-50/photo_08.jpeg',
+    ],
+    `${R2}/sfx%20.mp4`,
+    '2019 Azimut Fly 50 Flybridge For Sale in Miami | Liena Q Perez',
+    'Pristine 2019 Azimut Fly 50 "La Paloma" for sale in Miami, FL. 50ft flybridge yacht with twin Volvo Penta diesels, SeaKeeper stabilizer, 3 staterooms & flybridge bar. $980,000. Contact Liena Q Perez.',
+    '2019 Azimut Fly 50 for sale,Azimut 50 flybridge Miami,used Azimut yacht Florida,flybridge yacht Miami,50 foot yacht for sale,luxury yacht Miami',
   ),
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // 2. 2007 Fairline Squadron 65
-  // ───────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
+  // 2. 2013 Fairline Squadron 65
+  //    Slug matches DB exactly: 2013-fairline-squadron-65-miami-beach
+  //    Video: R2 CDN (fast)
+  // ─────────────────────────────────────────────────────────────────────────
   stub(
     2,
-    '2007-fairline-squadron-65-miami',
-    '2007 Fairline Squadron 65',
-    2007,
+    '2013-fairline-squadron-65-miami-beach',
+    '2013 Fairline Squadron 65',
+    null,
+    2013,
     'Fairline',
     'Squadron 65',
-    65,
-    499_000,
-    'Miami, Florida',
-    `Exceptional 2007 Fairline Squadron 65 — a flagship British motor yacht offering unmatched space, range, and offshore capability. This is one of the finest examples of the Squadron 65 on the market today.
+    66,
+    1_300_000,
+    'Miami Beach, Florida',
+    `An extraordinary opportunity to own the iconic 2013 Fairline Squadron 65 — a masterpiece of British yacht-building now available in Miami Beach. Bring all offers on this magnificent 66-foot motor yacht that redefines luxury afloat.
 
-Thoroughly refit and maintained to the highest standard, this Fairline Squadron 65 presents beautifully both inside and out. Ready for extended bluewater passages or island cruising in complete comfort.
+Sumptuous furnishings and hand-worked cabinetry are hallmarks of the Squadron range. Nowhere is it more elegantly expressed than in the long, wide single-level interior — a testament to the 65's ingenious flat floor design that is normally reserved for much larger yachts.
 
-Volume & Space: The full-beam master stateroom, VIP forward cabin, and two twin guest cabins provide accommodation for up to 8 guests in outstanding comfort. The main salon is vast by any standard — a true home away from home.
-
-Performance: Twin Volvo D12 engines provide excellent range and reliability, with a cruising speed of 22 knots and bluewater range for the Bahamas, Caribbean, and beyond.
-
-Turnkey Condition: New bottom paint, recently serviced engines, updated electronics suite. Survey available. Lying Miami, Florida — available for immediate viewing.`,
+The massive flybridge features three distinct social areas: a forward chaise longue and sun pad, aft-facing sunbeds, and a seating/dining area. Powered by twin Caterpillar C18-1150 diesels at 1,150hp each producing 32 knots, equipped with Seakeeper gyroscopic stabilizer, bow and stern thrusters, and a full garage for your tender.`,
     {
-      'LOA': '65 ft',
-      'Beam': '17 ft 5 in',
-      'Draft': '5 ft',
+      'Length Overall': '66 ft 11 in',
+      'Beam': '17 ft 2 in',
       'Hull Material': 'Fiberglass',
+      'Hull Shape': 'Modified Vee',
+      'Hull Class': 'Motor Yacht',
+      'Year': '2013',
       'Fuel Type': 'Diesel',
-      'Engine 1': 'Volvo D12 — 660 hp',
-      'Engine 2': 'Volvo D12 — 660 hp',
-      'Top Speed': '28 kn',
-      'Cruising Speed': '22 kn',
-      'Range': '350 nmi',
-      'Fuel Capacity': '1,100 gal',
-      'Water Capacity': '290 gal',
-      'Guest Cabins': '4',
-      'Crew Cabins': '1',
-      'Guest Heads': '4',
-      'Class': 'Motor Yacht',
-      'Condition': 'Used — Refit',
+      'Engine 1': 'CAT C18-1150 Inboard Diesel',
+      'Engine 2': 'CAT C18-1150 Inboard Diesel',
+      'Engine Hours': '690 hrs each',
+      'Total Power': '2,300 hp',
+      'Max Speed': '32 knots',
+      'Fuel Capacity': '936 gallons',
+      'Fresh Water': '305 gallons',
+      'Stabilizer': 'Seakeeper Gyroscopic',
+      'Condition': 'Used',
     },
     {
-      'Electronics': ['Raymarine chartplotter', 'Autopilot', 'Radar', 'VHF Radio', 'AIS', 'Depthsounder', 'Compass', 'Wind instruments'],
-      'Interior': ['Air Conditioning throughout', 'Heating', 'Generator (17.5 kW)', 'Hot Water', 'Fresh Water Maker', 'Refrigerator', 'Freezer', 'Dishwasher', 'Microwave', 'Oven', 'Washer/Dryer'],
-      'Deck & Exterior': ['Teak Cockpit', 'Bow Thruster', 'Stern Thruster', 'Hydraulic Swim Platform', 'Tender Garage', 'Hydraulic Gangway', 'Hard Top', 'Bimini'],
-      'Safety': ['Life raft', 'EPIRB', 'Fire suppression system', 'Man-overboard system'],
+      'Electronics': ['Garmin navigation system', 'Autopilot', 'GPS & chartplotter', 'Radar', 'VHF radio', 'Depth sounder', 'Wi-Fi aboard', 'Flat screen TVs', 'Cockpit speakers'],
+      'Interior Equipment': ['Full air conditioning', 'Seakeeper gyroscopic stabilizer', 'Bow thruster', 'Stern thruster', 'Dishwasher', 'Washing machine', 'Fresh water maker', 'Electric bilge pump', 'Microwave oven & full oven', 'Refrigerator', 'Hot water system', 'Generator'],
+      'Exterior & Deck': ['Teak cockpit', 'Teak sidedecks', 'Hydraulic hi-lo bathing platform', 'Hydraulic gangway', 'Cockpit table & cushions', 'Davit(s)', 'Fin stabilizers', 'Swimming ladder', 'Underwater lights', 'Walk-around deck', 'Bimini top'],
+      'Tender & Toys': ['Full garage for tender', 'Yamaha WaveRunner jet ski', 'Davits for tender launch'],
     },
-    '/videos/fairline-65.mp4',
-    '2007 Fairline Squadron 65 For Sale Miami | $499,000 | Liena Q Perez',
-    '2007 Fairline Squadron 65 for sale in Miami, FL. 65ft British motor yacht, twin Volvo D12 660hp, 4 staterooms, refit. Asking $499,000. Call Liena Q Perez — 786-838-9911.',
-    '2007 Fairline Squadron 65 for sale,Fairline Squadron 65 Miami,motor yacht Miami,used yacht for sale Florida,luxury motor yacht Miami',
+    [
+      '/listings/fairline-squadron-65/photo_02.jpeg',
+      '/listings/fairline-squadron-65/photo_07.jpeg',
+      '/listings/fairline-squadron-65/photo_08.jpeg',
+      '/listings/fairline-squadron-65/photo_09.jpeg',
+    ],
+    `${R2}/Final%20Fairline.mp4`,
+    '2013 Fairline Squadron 65 Motor Yacht For Sale Miami Beach | Liena Q Perez',
+    '2013 Fairline Squadron 65 for sale in Miami Beach, FL. 66ft motor yacht with twin CAT 1,150hp engines (690 hrs), Seakeeper, bow & stern thrusters, garage & WaveRunner. $1,300,000. Contact Liena Q Perez.',
+    '2013 Fairline Squadron 65 for sale,Fairline Squadron 65 Miami Beach,used motor yacht Florida,66 foot yacht for sale,Fairline yacht Miami,luxury motor yacht Miami Beach',
   ),
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
   // 3. 1999 Mangusta 80
-  // ───────────────────────────────────────────────────────────────────────────
+  //    Location: Miami, Florida (correct per PDF)
+  //    Video: local /videos/mangusta-80.mp4 (committed to repo)
+  // ─────────────────────────────────────────────────────────────────────────
   stub(
     3,
     '1999-mangusta-80-miami',
     '1999 Mangusta 80',
+    null,
     1999,
     'Mangusta',
     '80',
@@ -213,19 +228,23 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
       'Deck & Exterior': ['Teak Cockpit', 'Cockpit Cushions', 'Hydraulic Gangway', 'Swimming Ladder', 'Gyroscopic Stabilizer', 'Tender', 'Wind Generator', 'Bimini Top', 'Hard Top'],
       'Additional': ['Garage (tender storage)', 'Underwater Lights', 'Wine Cellar'],
     },
+    [], // no photos — video cover only
     '/videos/mangusta-80.mp4',
     '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
     '1999 Mangusta 80 for sale in Miami, FL. 80ft Italian express cruiser, twin MTU 2,000hp surface drives, comprehensive refit Oct 2025. Asking $699,000. Call 786-838-9911.',
     '1999 Mangusta 80 for sale,Mangusta 80 Miami,express cruiser Miami,Italian yacht Miami,used yacht for sale Florida',
   ),
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
   // 4. 2026 Nassima Yacht N40 — White
-  // ───────────────────────────────────────────────────────────────────────────
+  //    Location: Fort Lauderdale, Florida (correct per PDF)
+  //    Video: local /videos/nassima-n40-white.mp4 (committed to repo)
+  // ─────────────────────────────────────────────────────────────────────────
   stub(
     4,
     '2026-nassima-n40-white-fort-lauderdale',
     '2026 Nassima Yacht N40 — White',
+    null,
     2026,
     'Nassima Yacht',
     'N40',
@@ -269,19 +288,23 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
       'Anchoring & Docking': ['Anchor in stainless steel', 'Stainless steel chain', 'Anchor rinsing system', 'Anchor winch Lewmar 1,000W', 'Wired windlass control', 'Bow shower', 'Bow thruster Lewmar', 'Lewmar hatch'],
       'Electrical & Mechanical': ['Generator', 'Inverter', 'Shore power inlet', 'Battery charger', 'Electric bilge pump', 'Manual bilge pump', 'Electric head', 'Touch screen controls', 'Launching trailer included'],
     },
+    [], // no photos — video cover only
     '/videos/nassima-n40-white.mp4',
     '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
     '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
     '2026 Nassima N40 for sale,Nassima Yacht N40 white,luxury cruiser Fort Lauderdale,new yacht Florida,Italian boat for sale Miami',
   ),
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
   // 5. 2026 Nassima Yacht N40 — Grey
-  // ───────────────────────────────────────────────────────────────────────────
+  //    Location: Fort Lauderdale, Florida (correct per PDF)
+  //    Video: local /videos/nassima-n40-grey.mp4 (committed to repo)
+  // ─────────────────────────────────────────────────────────────────────────
   stub(
     5,
     '2026-nassima-n40-grey-fort-lauderdale',
     '2026 Nassima Yacht N40 — Grey',
+    null,
     2026,
     'Nassima Yacht',
     'N40',
@@ -327,6 +350,7 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
       'Anchoring & Docking': ['Anchor in stainless steel', 'Stainless steel chain', 'Anchor rinsing system', 'Anchor winch Lewmar 1,000W', 'Wired windlass control', 'Bow shower', 'Bow thruster Lewmar', 'Lewmar hatch'],
       'Electrical & Mechanical': ['Generator', 'Inverter', 'Shore power inlet', 'Battery charger', 'Electric bilge pump', 'Manual bilge pump', 'Electric head', 'Touch screen controls', 'Launching trailer included'],
     },
+    [], // no photos — video cover only
     '/videos/nassima-n40-grey.mp4',
     '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',
     '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',

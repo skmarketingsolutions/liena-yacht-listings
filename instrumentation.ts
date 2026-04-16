@@ -189,6 +189,54 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
       console.log('[instrumentation] Inserted: 2026 Nassima N40 Grey');
     }
 
+    // ── Data corrections: fix any wrong location / video_url in DB ────────────
+    // Runs on every startup — safe because queries are idempotent (WHERE guards).
+
+    // Nassimas: must show Fort Lauderdale, not Miami
+    await sql`
+      UPDATE listings
+      SET location = 'Fort Lauderdale, Florida', updated_at = NOW()
+      WHERE slug IN (
+        '2026-nassima-n40-white-fort-lauderdale',
+        '2026-nassima-n40-grey-fort-lauderdale'
+      )
+      AND location != 'Fort Lauderdale, Florida'
+    `;
+
+    // Ensure correct video URLs for the 3 new listings
+    await sql`
+      UPDATE listings
+      SET video_url = '/videos/mangusta-80.mp4', updated_at = NOW()
+      WHERE slug = '1999-mangusta-80-miami'
+        AND (video_url IS NULL OR video_url NOT LIKE '%mangusta%')
+    `;
+    await sql`
+      UPDATE listings
+      SET video_url = '/videos/nassima-n40-white.mp4', updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-white-fort-lauderdale'
+        AND (video_url IS NULL OR video_url NOT LIKE '%nassima-n40-white%')
+    `;
+    await sql`
+      UPDATE listings
+      SET video_url = '/videos/nassima-n40-grey.mp4', updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-grey-fort-lauderdale'
+        AND (video_url IS NULL OR video_url NOT LIKE '%nassima-n40-grey%')
+    `;
+
+    // Clear any stale photos on the 3 new listings — they use video covers only
+    await sql`
+      UPDATE listings
+      SET photos = '[]'::jsonb, updated_at = NOW()
+      WHERE slug IN (
+        '1999-mangusta-80-miami',
+        '2026-nassima-n40-white-fort-lauderdale',
+        '2026-nassima-n40-grey-fort-lauderdale'
+      )
+      AND photos != '[]'::jsonb
+    `;
+
+    console.log('[instrumentation] Data corrections applied');
+
   } catch (err) {
     // Never crash the server — just log
     console.error('[instrumentation] Auto-seed error:', err);

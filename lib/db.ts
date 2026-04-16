@@ -160,6 +160,7 @@ function slugify(text: string): string {
 // ── Listing queries ───────────────────────────────────────────────────────────
 
 export async function getAllListings(): Promise<Listing[]> {
+  let dbListings: Listing[] = [];
   try {
     const sql = getDb();
     const rows = await sql`
@@ -167,12 +168,28 @@ export async function getAllListings(): Promise<Listing[]> {
       WHERE status != 'draft'
       ORDER BY featured DESC, created_at DESC
     `;
-    // If DB returned rows, use them; otherwise fall back to static data
-    if (rows.length > 0) return rows.map(rowToListing);
+    dbListings = rows.map(rowToListing);
   } catch {
-    // DATABASE_URL not set or DB unreachable — fall through to static data
+    // DB unavailable — return static data only
+    return STATIC_LISTINGS;
   }
-  return STATIC_LISTINGS;
+
+  // Merge strategy:
+  // 1. For every static listing, use the DB version if one exists (DB has photos, real data, etc.)
+  // 2. For static slugs with NO matching DB row → include the static version as fallback
+  // 3. Append any DB listings not covered by static slugs
+  // This guarantees all 5 curated listings always appear even if the DB seed is incomplete.
+  const dbBySlug = new Map(dbListings.map((l) => [l.slug, l]));
+  const staticSlugs = new Set(STATIC_LISTINGS.map((l) => l.slug));
+
+  const merged: Listing[] = STATIC_LISTINGS.map((s) => dbBySlug.get(s.slug) ?? s);
+
+  for (const db of dbListings) {
+    if (!staticSlugs.has(db.slug)) merged.push(db);
+  }
+
+  // Featured first, preserve relative order otherwise
+  return merged.sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1));
 }
 
 export async function getAllListingsAdmin(): Promise<Listing[]> {

@@ -20,25 +20,27 @@ export default function YachtCard({ listing }: Props) {
         {listing.video_url ? (
           <video
             src={listing.video_url}
+            // Show first photo as poster frame while video buffers;
+            // falls back gracefully to the dark gradient if no photos
+            poster={listing.photos[0] || undefined}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             autoPlay
             muted
             loop
             playsInline
+            preload="auto"
+          />
+        ) : listing.photos[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={listing.photos[0]}
+            alt={listing.title}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          listing.photos[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={listing.photos[0]}
-              alt={listing.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-navy-900 to-navy-700 flex items-center justify-center">
-              <Play size={40} className="text-gold-500/30" />
-            </div>
-          )
+          <div className="absolute inset-0 bg-gradient-to-br from-navy-900 to-navy-700 flex items-center justify-center">
+            <Play size={40} className="text-gold-500/30" />
+          </div>
         )}
 
         {/* Gradient overlay */}

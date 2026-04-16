@@ -376,6 +376,45 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
       newListingsAdded.push('2026 Nassima N40 Grey');
     }
 
+    // ── Data corrections: fix stale location / video_url ────────────────────
+    await sql`
+      UPDATE listings
+      SET location = 'Fort Lauderdale, Florida', updated_at = NOW()
+      WHERE slug IN (
+        '2026-nassima-n40-white-fort-lauderdale',
+        '2026-nassima-n40-grey-fort-lauderdale'
+      )
+      AND location != 'Fort Lauderdale, Florida'
+    `;
+    await sql`
+      UPDATE listings
+      SET video_url = '/videos/mangusta-80.mp4', updated_at = NOW()
+      WHERE slug = '1999-mangusta-80-miami'
+        AND (video_url IS NULL OR video_url NOT LIKE '%mangusta%')
+    `;
+    await sql`
+      UPDATE listings
+      SET video_url = '/videos/nassima-n40-white.mp4', updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-white-fort-lauderdale'
+        AND (video_url IS NULL OR video_url NOT LIKE '%nassima-n40-white%')
+    `;
+    await sql`
+      UPDATE listings
+      SET video_url = '/videos/nassima-n40-grey.mp4', updated_at = NOW()
+      WHERE slug = '2026-nassima-n40-grey-fort-lauderdale'
+        AND (video_url IS NULL OR video_url NOT LIKE '%nassima-n40-grey%')
+    `;
+    await sql`
+      UPDATE listings
+      SET photos = '[]'::jsonb, updated_at = NOW()
+      WHERE slug IN (
+        '1999-mangusta-80-miami',
+        '2026-nassima-n40-white-fort-lauderdale',
+        '2026-nassima-n40-grey-fort-lauderdale'
+      )
+      AND photos != '[]'::jsonb
+    `;
+
     return NextResponse.json({
       success: true,
       message: 'Database ready',
