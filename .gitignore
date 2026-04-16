@@ -7,12 +7,15 @@ node_modules/
 .next/
 out/
 
-# ── Large media files (served from CDN) ───────────────────────────────────────
-public/videos/
-*.mp4
+# ── Large media files (served from R2 CDN — too big for git) ─────────────────
+public/videos/azimut-fly-50.mp4
+public/videos/fairline-65.mp4
 *.mov
 *.avi
 *.mkv
+
+# ── New listing videos committed directly (under 100MB each, Vercel CDN) ─────
+# mangusta-80.mp4, nassima-n40-white.mp4, nassima-n40-grey.mp4 are tracked
 
 # ── Environment / secrets ─────────────────────────────────────────────────────
 .env

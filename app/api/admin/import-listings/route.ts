@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
 
-const R2_BASE = 'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev';
+const R2_BASE = ''; // videos served from /videos/ (committed to git)
 
 const NEW_LISTINGS = [
   {
@@ -103,7 +103,7 @@ Well-maintained and ready to cruise — this Mangusta 80 has been meticulously s
       ],
     },
     photos: [] as string[],
-    video_url: `${R2_BASE}/mangusta-80.mp4`,
+    video_url: '/videos/mangusta-80.mp4',
     featured: true,
     status: 'active' as const,
     seo_title: '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
@@ -221,7 +221,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
       ],
     },
     photos: [] as string[],
-    video_url: `${R2_BASE}/nassima-n40-white.mp4`,
+    video_url: '/videos/nassima-n40-white.mp4',
     featured: true,
     status: 'active' as const,
     seo_title: '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
@@ -340,7 +340,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
       ],
     },
     photos: [] as string[],
-    video_url: `${R2_BASE}/nassima-n40-grey.mp4`,
+    video_url: '/videos/nassima-n40-grey.mp4',
     featured: true,
     status: 'active' as const,
     seo_title: '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',

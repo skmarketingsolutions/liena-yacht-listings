@@ -224,7 +224,7 @@ The massive flybridge features three distinct social areas: a forward chaise lon
     }
 
     // ── Always: insert new listings if they don't exist yet ──────────────────
-    const R2 = 'https://pub-d1d12a43eab2479bb077f5824229a67c.r2.dev';
+    const R2 = ''; // new videos served from /videos/ (committed to git)
     const newListingsAdded: string[] = [];
 
     // ── 1999 Mangusta 80 ─────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ Well-maintained and ready to cruise — comprehensive October 2025 refit coverin
           1999, 'Mangusta', '80', 80, 699000, 'Miami, Florida',
           ${mgDesc},
           ${mgSpecs}::jsonb, ${mgFeatures}::jsonb, '[]'::jsonb,
-          ${`${R2}/mangusta-80.mp4`},
+          ${'/videos/mangusta-80.mp4'},
           true, 'active', ${null},
           '1999 Mangusta 80 For Sale Miami | $699,000 | Liena Q Perez',
           '1999 Mangusta 80 for sale in Miami, FL. 80ft Italian express cruiser, twin MTU 2,000hp surface drives, comprehensive refit Oct 2025. Asking $699,000. Call 786-838-9911.',
@@ -315,7 +315,7 @@ Italian Craftsmanship: Garmin touch home automation (EmpireBUS), Fusion sound sy
           2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida',
           ${nwDesc},
           ${nwSpecs}::jsonb, ${nwFeatures}::jsonb, '[]'::jsonb,
-          ${`${R2}/nassima-n40-white.mp4`},
+          ${'/videos/nassima-n40-white.mp4'},
           true, 'active', ${null},
           '2026 Nassima Yacht N40 White For Sale Fort Lauderdale | $799,000',
           '2026 Nassima Yacht N40 (White) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
@@ -366,7 +366,7 @@ Garmin touch home automation (EmpireBUS), Fusion sound system, teak cockpit and 
           2026, 'Nassima Yacht', 'N40', 40, 799000, 'Fort Lauderdale, Florida',
           ${ngDesc},
           ${ngSpecs}::jsonb, ${ngFeatures}::jsonb, '[]'::jsonb,
-          ${`${R2}/nassima-n40-grey.mp4`},
+          ${'/videos/nassima-n40-grey.mp4'},
           true, 'active', ${null},
           '2026 Nassima Yacht N40 Grey For Sale Fort Lauderdale | $799,000',
           '2026 Nassima Yacht N40 (Grey) — new Italian luxury cruiser, 40ft, twin Mercury Verado 400hp, 45 knots, Fort Lauderdale. Asking $799,000. Contact Liena Q Perez — 786-838-9911.',
