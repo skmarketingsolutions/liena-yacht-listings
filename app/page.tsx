@@ -41,12 +41,8 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'; // always fresh from DB
 
 export default async function HomePage() {
-  let listings: Awaited<ReturnType<typeof getAllListings>> = [];
-  try {
-    listings = await getAllListings();
-  } catch {
-    // DATABASE_URL not configured — render empty state instead of crashing
-  }
+  // getAllListings() falls back to static data if DB is unavailable
+  const listings = await getAllListings();
 
   const videoUrl = process.env.NEXT_PUBLIC_HERO_VIDEO_URL || '';
 

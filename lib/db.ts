@@ -1,9 +1,14 @@
 /**
  * Neon Postgres database layer.
  * All functions are async — await them in route handlers and server pages.
+ *
+ * Fallback behaviour: when DATABASE_URL is not set OR the DB returns zero
+ * rows, the static listings from lib/listings-data.ts are returned instead.
+ * This guarantees listings always appear on the live site.
  */
 
 import { neon } from '@neondatabase/serverless';
+import { STATIC_LISTINGS } from './listings-data';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -155,13 +160,19 @@ function slugify(text: string): string {
 // ── Listing queries ───────────────────────────────────────────────────────────
 
 export async function getAllListings(): Promise<Listing[]> {
-  const sql = getDb();
-  const rows = await sql`
-    SELECT * FROM listings
-    WHERE status != 'draft'
-    ORDER BY featured DESC, created_at DESC
-  `;
-  return rows.map(rowToListing);
+  try {
+    const sql = getDb();
+    const rows = await sql`
+      SELECT * FROM listings
+      WHERE status != 'draft'
+      ORDER BY featured DESC, created_at DESC
+    `;
+    // If DB returned rows, use them; otherwise fall back to static data
+    if (rows.length > 0) return rows.map(rowToListing);
+  } catch {
+    // DATABASE_URL not set or DB unreachable — fall through to static data
+  }
+  return STATIC_LISTINGS;
 }
 
 export async function getAllListingsAdmin(): Promise<Listing[]> {
@@ -194,11 +205,16 @@ export async function getFeaturedListings(): Promise<Listing[]> {
 }
 
 export async function getListingBySlug(slug: string): Promise<Listing | null> {
-  const sql = getDb();
-  const rows = await sql`
-    SELECT * FROM listings WHERE slug = ${slug} LIMIT 1
-  `;
-  return rows.length > 0 ? rowToListing(rows[0]) : null;
+  try {
+    const sql = getDb();
+    const rows = await sql`
+      SELECT * FROM listings WHERE slug = ${slug} LIMIT 1
+    `;
+    if (rows.length > 0) return rowToListing(rows[0]);
+  } catch {
+    // Fall through to static data
+  }
+  return STATIC_LISTINGS.find((l) => l.slug === slug) ?? null;
 }
 
 export async function getListingById(id: number): Promise<Listing | null> {
